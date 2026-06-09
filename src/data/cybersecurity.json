@@ -1,0 +1,106 @@
+{
+  "topics": [
+    {
+      "id": "smart-cities",
+      "title": "Why Smart Cities Need Cybersecurity",
+      "icon": "Building",
+      "color": "cyber",
+      "content": "Smart cities connect thousands of devices — traffic lights, sensors, cameras, water systems — all communicating over networks. A single vulnerability can cascade into city-wide disruptions. In 2021, a hacker gained access to a Florida water treatment plant through an unsecured remote access tool. Cybersecurity isn't optional for critical infrastructure.",
+      "example": "In 2020, hackers disrupted traffic signal systems in multiple US cities by exploiting unpatched software in signal controllers."
+    },
+    {
+      "id": "password-safety",
+      "title": "Password Safety",
+      "icon": "Lock",
+      "color": "violet",
+      "content": "Weak passwords are the #1 entry point for attackers. A password like '123456' can be cracked in under 1 second. Strong passwords use 12+ characters, mix letters/numbers/symbols, and are unique per account. Password managers help you maintain strong, unique passwords without memorizing them all.",
+      "tips": ["Use 12+ characters", "Mix uppercase, lowercase, numbers, symbols", "Never reuse passwords", "Use a password manager", "Enable two-factor authentication (2FA)"]
+    },
+    {
+      "id": "phishing",
+      "title": "Phishing Awareness",
+      "icon": "Fish",
+      "color": "teal",
+      "content": "Phishing attacks trick users into revealing passwords or clicking malicious links by impersonating trusted sources. 36% of all data breaches involve phishing. AI is now being used to craft hyper-personalized 'spear phishing' emails — making them harder to spot than ever.",
+      "redFlags": ["Urgent or threatening language", "Mismatched sender email domains", "Generic greetings ('Dear User')", "Requests for passwords or financial info", "Suspicious links (hover before clicking)"]
+    },
+    {
+      "id": "data-privacy",
+      "title": "Data Privacy",
+      "icon": "Eye",
+      "color": "cyber",
+      "content": "Every app you use collects data about you. Smart city sensors collect location, movement, and behavior data. Understanding what data is collected, who owns it, and how it's used is fundamental to digital citizenship. You have rights — including the right to know and the right to opt out.",
+      "principles": ["Data minimization: collect only what's needed", "Consent: users should opt in, not out", "Transparency: clear privacy policies", "Right to access and delete your data"]
+    },
+    {
+      "id": "responsible-ai",
+      "title": "Responsible AI",
+      "icon": "Bot",
+      "color": "violet",
+      "content": "AI systems that control traffic, medical diagnostics, or loan approvals must be designed responsibly. Responsible AI means ensuring systems are fair (no discrimination), accountable (someone is responsible for mistakes), transparent (explainable decisions), and safe (tested before deployment).",
+      "principles": ["Fairness: no discriminatory outcomes", "Accountability: clear human oversight", "Transparency: explainable decisions", "Safety: rigorous testing before deployment"]
+    }
+  ],
+  "quiz": [
+    {
+      "id": 1,
+      "question": "You receive an urgent email from 'support@paypa1.com' saying your account will be suspended unless you verify your details within 24 hours. What are TWO red flags that identify this as a phishing attempt?",
+      "options": [
+        "The email uses urgent language AND the domain 'paypa1.com' substitutes the number 1 for the letter l",
+        "The email was sent at night AND it mentions your account",
+        "The email has a logo AND asks you to click a link",
+        "The email is longer than usual AND mentions a deadline"
+      ],
+      "correct": 0,
+      "explanation": "'paypa1.com' uses the number 1 instead of the letter l — a classic homograph phishing trick. Combined with artificial urgency ('24 hours'), these are textbook phishing tactics. Legitimate companies never demand immediate action via email. Always navigate directly to a site by typing its URL."
+    },
+    {
+      "id": 2,
+      "question": "A hacker uses a technique called a 'brute force attack' against a login system. Which combination of defenses would be MOST effective at stopping it?",
+      "options": [
+        "Using a longer username and changing it frequently",
+        "Account lockout after failed attempts + strong password + 2FA",
+        "Using a private browsing window and clearing cookies regularly",
+        "Logging out after every session and using a VPN"
+      ],
+      "correct": 1,
+      "explanation": "Brute force attacks try millions of password combinations automatically. Account lockout stops the automated guessing. A strong password makes each guess less likely to succeed. 2FA means even a correct password guess isn't enough — the attacker still needs the second factor (your phone or biometric)."
+    },
+    {
+      "id": 3,
+      "question": "A smart city deploys AI-powered surveillance cameras that track pedestrian movement across the entire city. Which data privacy principle is MOST at risk?",
+      "options": [
+        "Data minimization — the city is collecting far more location data than necessary for any specific stated purpose",
+        "Encryption — the video feeds aren't being encrypted properly",
+        "Authentication — pedestrians haven't verified their identities",
+        "Redundancy — there aren't enough backup servers for the data"
+      ],
+      "correct": 0,
+      "explanation": "Data minimization means collecting only what is strictly needed for a defined purpose. City-wide pedestrian tracking generates massive behavioral profiles without a specific justified need — violating this principle. This is why cities like San Francisco have banned government use of facial recognition in public spaces."
+    },
+    {
+      "id": 4,
+      "question": "An attacker compromises a traffic management system and manipulates signals to create gridlock during a mass evacuation. What category of cyberattack is this, and what makes it especially dangerous?",
+      "options": [
+        "A phishing attack — dangerous because it steals personal data from drivers",
+        "A critical infrastructure attack — dangerous because it directly threatens human safety by disrupting emergency response",
+        "A ransomware attack — dangerous because the city must pay to restore service",
+        "A DDoS attack — dangerous because it overwhelms the network with traffic"
+      ],
+      "correct": 1,
+      "explanation": "Attacks on critical infrastructure (power grids, water systems, traffic networks) are uniquely dangerous because they bridge the cyber and physical worlds. Disrupting traffic signals during an evacuation could block ambulances, fire trucks, and emergency vehicles — turning a cyber incident into a life-threatening physical disaster."
+    },
+    {
+      "id": 5,
+      "question": "An AI content moderation system incorrectly removes posts from minority communities at 3x the rate of majority communities, even when content is similar. What is the responsible AI response?",
+      "options": [
+        "Accept the disparity — AI decisions are objective because they're mathematical",
+        "Audit the training data and model outputs for bias, retrain on more representative data, and implement human review for appeals",
+        "Lower the confidence threshold so the AI flags less content overall",
+        "Switch to a rule-based system that doesn't use AI at all"
+      ],
+      "correct": 1,
+      "explanation": "Responsible AI requires identifying and correcting disparate impact — when a system disproportionately harms a protected group. The fix involves auditing training data for underrepresentation or bias, retraining with balanced datasets, testing outputs across demographic groups, and maintaining human oversight with an appeals process. Math doesn't make decisions fair — the data and design do."
+    }
+  ]
+}

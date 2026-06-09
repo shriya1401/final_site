@@ -1,0 +1,36 @@
+{
+  "hero": {
+    "title": "AI on the Streets",
+    "subtitle": "Smarter Signals, Smarter People",
+    "tagline": "Teaching the Next Generation How AI Can Improve Communities"
+  },
+  "stats": [
+    { "id": 1, "label": "Students Reached", "value": 450, "suffix": "+", "icon": "Users" },
+    { "id": 2, "label": "Workshops Conducted", "value": 18, "suffix": "", "icon": "BookOpen" },
+    { "id": 3, "label": "Community Partners", "value": 7, "suffix": "", "icon": "Handshake" },
+    { "id": 4, "label": "Schools Visited", "value": 12, "suffix": "", "icon": "School" }
+  ],
+  "highlights": [
+    {
+      "id": 1,
+      "title": "Interactive AI Simulation",
+      "description": "Students control a live 4-way intersection comparing fixed timers vs. sensor-based vs. AI-adaptive signals — based on real Python simulations.",
+      "icon": "TrafficCone",
+      "color": "cyber"
+    },
+    {
+      "id": 2,
+      "title": "Cybersecurity Awareness",
+      "description": "Hands-on quizzes and real-world examples teach students why smart cities need strong digital defenses.",
+      "icon": "Shield",
+      "color": "violet"
+    },
+    {
+      "id": 3,
+      "title": "STEM Career Pathways",
+      "description": "Resources connecting students to AI, transportation engineering, and cybersecurity career opportunities.",
+      "icon": "Rocket",
+      "color": "teal"
+    }
+  ]
+}

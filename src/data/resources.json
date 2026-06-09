@@ -1,0 +1,90 @@
+[
+  {
+    "id": 1,
+    "title": "AI Traffic Workshop Slides",
+    "description": "Full slide deck used in student workshops covering AI basics, traffic signals, and the simulation.",
+    "category": "Workshop Slides",
+    "icon": "Presentation",
+    "size": "4.2 MB",
+    "format": "PDF",
+    "audience": ["Middle School", "High School"],
+    "tags": ["AI", "Traffic", "Workshop"]
+  },
+  {
+    "id": 2,
+    "title": "Fixed Timer vs AI Signal Activity Sheet",
+    "description": "Printable worksheet where students record observations while running the simulation modes.",
+    "category": "Activity Sheets",
+    "icon": "FileText",
+    "size": "1.1 MB",
+    "format": "PDF",
+    "audience": ["Elementary", "Middle School"],
+    "tags": ["Activity", "Traffic", "Simulation"]
+  },
+  {
+    "id": 3,
+    "title": "Introduction to Machine Learning Lesson Plan",
+    "description": "A 45-minute lesson plan introducing ML concepts with hands-on examples for K-8 teachers.",
+    "category": "AI Lesson Plans",
+    "icon": "Brain",
+    "size": "2.3 MB",
+    "format": "PDF",
+    "audience": ["Elementary", "Middle School"],
+    "tags": ["AI", "Machine Learning", "Lesson Plan"]
+  },
+  {
+    "id": 4,
+    "title": "Cybersecurity Basics Handout",
+    "description": "Student-friendly guide covering passwords, phishing, and data privacy essentials.",
+    "category": "Cybersecurity Handouts",
+    "icon": "Shield",
+    "size": "0.8 MB",
+    "format": "PDF",
+    "audience": ["Middle School", "High School"],
+    "tags": ["Cybersecurity", "Safety", "Privacy"]
+  },
+  {
+    "id": 5,
+    "title": "STEM Careers in AI & Transportation",
+    "description": "Career exploration guide featuring 15 STEM professions, salary ranges, and education pathways.",
+    "category": "STEM Career Resources",
+    "icon": "Briefcase",
+    "size": "3.5 MB",
+    "format": "PDF",
+    "audience": ["High School"],
+    "tags": ["Careers", "STEM", "AI"]
+  },
+  {
+    "id": 6,
+    "title": "Smart City Vocabulary Flashcards",
+    "description": "Printable flashcards with 30 key terms in AI, sensors, and urban technology.",
+    "category": "Activity Sheets",
+    "icon": "Layers",
+    "size": "0.5 MB",
+    "format": "PDF",
+    "audience": ["Elementary", "Middle School"],
+    "tags": ["Vocabulary", "Smart City", "Activity"]
+  },
+  {
+    "id": 7,
+    "title": "AI Ethics Discussion Guide",
+    "description": "Facilitated discussion prompts on fairness, bias, and responsible AI for high school classrooms.",
+    "category": "AI Lesson Plans",
+    "icon": "Scale",
+    "size": "1.9 MB",
+    "format": "PDF",
+    "audience": ["High School"],
+    "tags": ["Ethics", "AI", "Discussion"]
+  },
+  {
+    "id": 8,
+    "title": "Parent & Community Info Sheet",
+    "description": "One-page overview of the Gold Award project for parents and community members.",
+    "category": "Workshop Slides",
+    "icon": "FileText",
+    "size": "0.3 MB",
+    "format": "PDF",
+    "audience": ["Community"],
+    "tags": ["Community", "Gold Award", "Overview"]
+  }
+]

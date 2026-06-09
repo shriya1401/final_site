@@ -1,0 +1,56 @@
+{
+  "testimonials": [
+    {
+      "id": 1,
+      "name": "Ms. Rodriguez",
+      "role": "7th Grade Science Teacher",
+      "school": "Lincoln Middle School",
+      "quote": "The simulation made abstract AI concepts tangible. My students were genuinely excited — they kept asking to run it again and try different settings.",
+      "rating": 5
+    },
+    {
+      "id": 2,
+      "name": "Principal Davis",
+      "role": "Elementary School Principal",
+      "school": "Riverside Elementary",
+      "quote": "A remarkable project. The presenter connected with every age group, and the hands-on component kept even our youngest students fully engaged.",
+      "rating": 5
+    },
+    {
+      "id": 3,
+      "name": "Alex T.",
+      "role": "9th Grade Student",
+      "school": "Jefferson High School",
+      "quote": "I never thought about how traffic lights could use AI. Now I want to study computer science. The RL explanation was actually easy to follow!",
+      "rating": 5
+    },
+    {
+      "id": 4,
+      "name": "Dr. Kim",
+      "role": "STEM Coordinator",
+      "school": "San Diego Unified School District",
+      "quote": "This Gold Award project is exactly the kind of community-driven STEM outreach we need more of. The resources are high-quality and curriculum-aligned.",
+      "rating": 5
+    },
+    {
+      "id": 5,
+      "name": "Maya S.",
+      "role": "8th Grade Student",
+      "school": "King Middle School",
+      "quote": "The cybersecurity quiz was really fun and kind of scary — I didn't realize how easy it is to get phished. Changed how I think about online safety.",
+      "rating": 5
+    }
+  ],
+  "goals": [
+    { "id": 1, "goal": "Reach 500 students across San Diego County", "progress": 90, "current": 450, "target": 500 },
+    { "id": 2, "goal": "Conduct 20 school/community workshops", "progress": 90, "current": 18, "target": 20 },
+    { "id": 3, "goal": "Partner with 10 organizations", "progress": 70, "current": 7, "target": 10 },
+    { "id": 4, "goal": "Develop 8 downloadable resources", "progress": 100, "current": 8, "target": 8 }
+  ],
+  "impactMetrics": [
+    { "label": "Pre/Post Quiz Improvement", "value": "34%", "description": "Average improvement in AI literacy scores after workshops" },
+    { "label": "Students Interested in STEM Careers", "value": "78%", "description": "Reported increased interest in STEM fields post-workshop" },
+    { "label": "Teacher Satisfaction Rate", "value": "96%", "description": "Teachers who rated the workshop as 'excellent' or 'very good'" },
+    { "label": "Resources Downloaded", "value": "1,200+", "description": "Total resource downloads across all platforms" }
+  ]
+}

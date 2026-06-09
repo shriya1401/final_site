@@ -1,0 +1,120 @@
+{
+  "sections": [
+    {
+      "id": "what-is-ai",
+      "title": "What is Artificial Intelligence?",
+      "icon": "Brain",
+      "color": "cyber",
+      "summary": "AI is software that learns from data and makes decisions — like a traffic light that gets smarter over time.",
+      "content": "Artificial Intelligence (AI) refers to computer systems that can perform tasks that normally require human intelligence: recognizing patterns, making decisions, and improving from experience. Unlike traditional programs that follow fixed rules, AI can adapt based on new data.",
+      "keyPoints": ["Pattern recognition", "Decision-making from data", "Learning and adaptation", "Automation of complex tasks"]
+    },
+    {
+      "id": "machine-learning",
+      "title": "Machine Learning Basics",
+      "icon": "Cpu",
+      "color": "violet",
+      "summary": "Machine Learning is how AI learns — by feeding it examples until it recognizes patterns on its own.",
+      "content": "Machine Learning (ML) is a subset of AI where systems learn from data without being explicitly programmed for each situation. There are three main types: Supervised Learning (learns from labeled examples), Unsupervised Learning (finds patterns without labels), and Reinforcement Learning (learns by trial and reward).",
+      "keyPoints": ["Supervised Learning", "Unsupervised Learning", "Reinforcement Learning", "Neural Networks"]
+    },
+    {
+      "id": "ai-transportation",
+      "title": "AI in Transportation",
+      "icon": "Car",
+      "color": "teal",
+      "summary": "AI already manages traffic in major cities, cutting wait times by up to 25% and reducing emissions.",
+      "content": "Smart traffic systems use AI to analyze real-time sensor data and optimize signal timing. This project's simulation mirrors real systems like those used in Pittsburgh's SURTRAC project, which reduced travel time by 25% and emissions by 21% using AI-adaptive signals.",
+      "keyPoints": ["Smart traffic signals", "Autonomous vehicles", "Predictive routing", "Emissions reduction"]
+    },
+    {
+      "id": "ai-healthcare",
+      "title": "AI in Healthcare",
+      "icon": "Heart",
+      "color": "cyber",
+      "summary": "AI helps doctors detect diseases earlier and personalize treatment plans with greater accuracy.",
+      "content": "AI is revolutionizing healthcare by analyzing medical images to detect cancer, predicting patient outcomes, accelerating drug discovery, and enabling personalized medicine. Machine learning models can spot patterns in X-rays and MRIs that human doctors might miss.",
+      "keyPoints": ["Medical image analysis", "Drug discovery", "Patient outcome prediction", "Personalized medicine"]
+    },
+    {
+      "id": "ai-cybersecurity",
+      "title": "AI in Cybersecurity",
+      "icon": "Shield",
+      "color": "violet",
+      "summary": "AI defends networks by detecting threats in real-time — and attackers use it too, making the battle ongoing.",
+      "content": "AI powers both sides of cybersecurity. Defensive AI can detect unusual network behavior (anomaly detection), identify malware, and respond to threats faster than any human. But attackers use AI to craft more convincing phishing emails and find vulnerabilities. This is why AI ethics and security are inseparable.",
+      "keyPoints": ["Anomaly detection", "Malware identification", "Threat response automation", "Adversarial AI"]
+    },
+    {
+      "id": "ai-ethics",
+      "title": "AI Ethics",
+      "icon": "Scale",
+      "color": "teal",
+      "summary": "AI must be fair, transparent, and accountable — because biased AI can cause real harm to real people.",
+      "content": "AI ethics addresses the moral questions around building and deploying AI systems. Key concerns include algorithmic bias (AI that treats certain groups unfairly due to biased training data), transparency (can we explain why an AI made a decision?), privacy (what data does AI collect?), and accountability (who is responsible when AI goes wrong?).",
+      "keyPoints": ["Algorithmic fairness", "Transparency & explainability", "Data privacy", "Human oversight"]
+    }
+  ],
+  "quiz": [
+    {
+      "id": 1,
+      "question": "What type of machine learning does the traffic simulation's Mode C (AI Adaptive) use, and what makes it different from supervised learning?",
+      "options": [
+        "Supervised Learning — it learns from a labeled dataset of correct signal timings",
+        "Reinforcement Learning — an agent learns by receiving rewards for reducing queue lengths through trial and error",
+        "Unsupervised Learning — it clusters traffic patterns without any feedback",
+        "Rule-based AI — it follows a fixed set of if-then conditions programmed by engineers"
+      ],
+      "correct": 1,
+      "explanation": "Reinforcement Learning (RL) is unique because there's no labeled dataset. The agent (signal controller) tries different actions, observes outcomes (queue length, wait times), and receives a reward signal. Over many iterations it learns a policy that maximizes throughput — exactly how Pittsburgh's SURTRAC system works."
+    },
+    {
+      "id": 2,
+      "question": "A neural network trained to approve loan applications is found to deny loans to qualified applicants from certain zip codes at a higher rate. What is the most likely cause?",
+      "options": [
+        "The neural network has too many layers and is overfitting",
+        "The training data reflected historical lending discrimination, so the model learned a biased pattern",
+        "The model is underfitting because it hasn't seen enough data",
+        "Neural networks are mathematically incapable of processing geographic data fairly"
+      ],
+      "correct": 1,
+      "explanation": "This is algorithmic bias caused by biased training data. If historical loan data already contained discriminatory patterns (e.g., redlining), the model learns to replicate those patterns. This is why auditing training data for fairness is as important as tuning the model itself."
+    },
+    {
+      "id": 3,
+      "question": "Which of the following best describes the difference between Artificial Intelligence and Machine Learning?",
+      "options": [
+        "They are the same thing — AI and ML are interchangeable terms",
+        "Machine Learning is a broader field that includes AI as a subset",
+        "AI is the broader field of creating intelligent systems; Machine Learning is one technique within AI that learns from data",
+        "AI only refers to robots, while Machine Learning refers to software"
+      ],
+      "correct": 2,
+      "explanation": "AI is the overarching field — any technique that makes machines behave intelligently. ML is one powerful approach within AI where systems learn patterns from data rather than being explicitly programmed. Other AI approaches include rule-based expert systems and evolutionary algorithms."
+    },
+    {
+      "id": 4,
+      "question": "An AI model achieves 99% accuracy diagnosing a rare disease that affects only 1% of the population. Why might this model be practically useless?",
+      "options": [
+        "99% accuracy is too low for medical applications",
+        "The model is likely predicting 'no disease' for every patient, which is correct 99% of the time but catches zero actual cases",
+        "Medical AI must achieve 100% accuracy to be considered valid",
+        "The model has too many parameters and needs to be simplified"
+      ],
+      "correct": 1,
+      "explanation": "This is the 'accuracy paradox.' With a 1% disease prevalence, a model that always predicts 'healthy' is 99% accurate — but completely useless clinically. Better metrics for imbalanced datasets are precision, recall, and F1-score, which measure how well the model actually identifies positive cases."
+    },
+    {
+      "id": 5,
+      "question": "In the context of AI transparency, what is an 'explainable AI' (XAI) system, and why is it especially important for high-stakes decisions?",
+      "options": [
+        "An AI that can explain jokes and metaphors to users",
+        "An AI whose decision-making process can be interpreted by humans, so they can understand and challenge how conclusions were reached",
+        "An AI trained on publicly available data so its knowledge is explainable",
+        "An AI with a simpler design that runs faster and uses less memory"
+      ],
+      "correct": 1,
+      "explanation": "Explainable AI (XAI) produces models whose reasoning can be understood by humans — not just 'the model said so.' In high-stakes domains like criminal sentencing, medical diagnosis, or loan approvals, people have a right to know why a decision was made and to contest it if it's wrong."
+    }
+  ]
+}

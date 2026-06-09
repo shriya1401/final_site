@@ -1,0 +1,69 @@
+[
+  {
+    "id": 1,
+    "level": "Elementary School",
+    "grades": "K–5",
+    "color": "teal",
+    "duration": "45 minutes",
+    "title": "Traffic Lights & Robots",
+    "description": "An engaging, hands-on introduction to how traffic lights work and how computers make decisions — using games, visuals, and guided play.",
+    "outcomes": [
+      "Understand that computers follow instructions (algorithms)",
+      "Learn why traffic lights exist and how they help communities",
+      "Identify examples of technology that helps people",
+      "Complete a simple sorting activity that mimics AI logic"
+    ],
+    "agenda": [
+      { "time": "0–5 min", "activity": "Welcome & Icebreaker — 'Robot Says'" },
+      { "time": "5–15 min", "activity": "Story: How does a traffic light know when to change?" },
+      { "time": "15–30 min", "activity": "Hands-on: Color-coding card sorting activity" },
+      { "time": "30–40 min", "activity": "Live demo: Watch the traffic simulation" },
+      { "time": "40–45 min", "activity": "Wrap-up & Q&A" }
+    ]
+  },
+  {
+    "id": 2,
+    "level": "Middle School",
+    "grades": "6–8",
+    "color": "violet",
+    "duration": "60 minutes",
+    "title": "Sensors, Data & Smart Signals",
+    "description": "Students explore how sensor data powers smart traffic signals, run the simulation in two modes, and discuss the tradeoffs between fixed-timer and sensor-based systems.",
+    "outcomes": [
+      "Explain how induction-loop sensors detect vehicles",
+      "Compare fixed-timer vs. actuated (sensor) traffic control",
+      "Read and interpret simulation metrics (wait time, throughput)",
+      "Discuss real-world tradeoffs in smart city technology"
+    ],
+    "agenda": [
+      { "time": "0–5 min", "activity": "Introduction & Gold Award overview" },
+      { "time": "5–20 min", "activity": "Mini-lecture: Sensors, IoT, and smart infrastructure" },
+      { "time": "20–40 min", "activity": "Guided simulation: Run Mode A and Mode B, record metrics" },
+      { "time": "40–55 min", "activity": "Group discussion: Which mode performed better and why?" },
+      { "time": "55–60 min", "activity": "Career spotlight + Q&A" }
+    ]
+  },
+  {
+    "id": 3,
+    "level": "High School",
+    "grades": "9–12",
+    "color": "cyber",
+    "duration": "90 minutes",
+    "title": "AI, Reinforcement Learning & Smart Cities",
+    "description": "A deep dive into AI-powered adaptive traffic control using Reinforcement Learning concepts, data analysis, and cybersecurity considerations for smart infrastructure.",
+    "outcomes": [
+      "Understand Reinforcement Learning: agents, states, rewards",
+      "Run all three simulation modes and analyze performance data",
+      "Identify cybersecurity vulnerabilities in smart city systems",
+      "Connect STEM skills to AI engineering career pathways"
+    ],
+    "agenda": [
+      { "time": "0–10 min", "activity": "Introduction: What is Reinforcement Learning?" },
+      { "time": "10–30 min", "activity": "Lecture + demo: RL Q-Learning applied to traffic signals" },
+      { "time": "30–55 min", "activity": "Simulation lab: All three modes, data collection & comparison" },
+      { "time": "55–70 min", "activity": "Cybersecurity module: Smart city attack surfaces" },
+      { "time": "70–85 min", "activity": "STEM career panel / pathways discussion" },
+      { "time": "85–90 min", "activity": "Reflection & resource handout" }
+    ]
+  }
+]
