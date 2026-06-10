@@ -138,6 +138,21 @@
     border-color: rgba(0,212,255,0.45);
     background: rgba(255,255,255,0.08);
   }
+  /* Select dropdowns need a solid background so options are readable */
+  select.input-field {
+    background: #0e1f3d;
+    cursor: pointer;
+  }
+  select.input-field:focus {
+    background: #0e1f3d;
+  }
+  select.input-field option {
+    background: #0e1f3d;
+    color: white;
+  }
+  select.input-field option:disabled {
+    color: rgba(255,255,255,0.35);
+  }
 }
 
 /* Scrollbar */
