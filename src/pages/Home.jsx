@@ -124,7 +124,7 @@ export default function Home() {
               PROJECT IMPACT
             </span>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-3 gap-4">
             {siteData.stats.map(stat => (
               <div key={stat.id} className="metric-card">
                 <div className="font-display text-4xl md:text-5xl font-black cyber-text mb-1">

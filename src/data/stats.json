@@ -5,16 +5,33 @@
     "tagline": "Teaching the Next Generation How AI Can Improve Communities"
   },
   "stats": [
-    { "id": 1, "label": "Students Reached", "value": 450, "suffix": "+", "icon": "Users" },
-    { "id": 2, "label": "Workshops Conducted", "value": 18, "suffix": "", "icon": "BookOpen" },
-    { "id": 3, "label": "Community Partners", "value": 7, "suffix": "", "icon": "Handshake" },
-    { "id": 4, "label": "Schools Visited", "value": 12, "suffix": "", "icon": "School" }
+    {
+      "id": 1,
+      "label": "Students Reached",
+      "value": 450,
+      "suffix": "+",
+      "icon": "Users"
+    },
+    {
+      "id": 2,
+      "label": "Workshops Conducted",
+      "value": 18,
+      "suffix": "",
+      "icon": "BookOpen"
+    },
+    {
+      "id": 3,
+      "label": "Community Partners",
+      "value": 7,
+      "suffix": "",
+      "icon": "Handshake"
+    }
   ],
   "highlights": [
     {
       "id": 1,
       "title": "Interactive AI Simulation",
-      "description": "Students control a live 4-way intersection comparing fixed timers vs. sensor-based vs. AI-adaptive signals — based on real Python simulations.",
+      "description": "Students control a live 4-way intersection comparing fixed timers vs. sensor-based vs. AI-adaptive signals \u2014 based on real Python simulations.",
       "icon": "TrafficCone",
       "color": "cyber"
     },
