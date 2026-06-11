@@ -51,6 +51,6 @@
     { "label": "Pre/Post Quiz Improvement", "value": "34%", "description": "Average improvement in AI literacy scores after workshops" },
     { "label": "Students Interested in STEM Careers", "value": "78%", "description": "Reported increased interest in STEM fields post-workshop" },
     { "label": "Teacher Satisfaction Rate", "value": "96%", "description": "Teachers who rated the workshop as 'excellent' or 'very good'" },
-    { "label": "Resources Downloaded", "value": "1,200+", "description": "Total resource downloads across all platforms" }
+    { "label": "Resources Downloaded", "value": "In Progress", "description": "Total resource downloads across all platforms" }
   ]
 }
