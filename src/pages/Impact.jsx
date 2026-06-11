@@ -35,9 +35,9 @@ function GoalProgress({ goal, color, index }) {
 
 export default function Impact() {
   const workshopChartData = [
-    { name: "Elementary", workshops: 6, students: 150 },
-    { name: "Middle School", workshops: 8, students: 200 },
-    { name: "High School", workshops: 4, students: 100 },
+    { name: "Elementary", workshops: 2, students: 50 },
+    { name: "Middle School", workshops: 2, students: 30 },
+    { name: "High School", workshops: 1, students: 20 },
   ];
 
   return (
@@ -102,9 +102,9 @@ export default function Impact() {
             </div>
             <div className="space-y-4 mt-6">
               {[
-                { label: "Elementary (K–5)", value: 150, total: 450, color: "#14b8a6" },
-                { label: "Middle School (6–8)", value: 200, total: 450, color: "#7c3aed" },
-                { label: "High School (9–12)", value: 100, total: 450, color: "#00d4ff" },
+                { label: "Elementary (K–5)", value: 50, total: 100, color: "#14b8a6" },
+                { label: "Middle School (6–8)", value: 30, total: 100, color: "#7c3aed" },
+                { label: "High School (9–12)", value: 20, total: 100, color: "#00d4ff" },
               ].map(item => (
                 <div key={item.label}>
                   <div className="flex justify-between text-sm mb-1">
@@ -118,7 +118,7 @@ export default function Impact() {
               ))}
               <div className="border-t border-white/10 pt-4 text-center">
                 <div className="font-display text-4xl font-black cyber-text">
-                  <AnimatedCounter target={450} suffix="+" />
+                  <AnimatedCounter target={100} suffix="+" />
                 </div>
                 <div className="text-white/50 text-sm">Total Students Reached</div>
               </div>

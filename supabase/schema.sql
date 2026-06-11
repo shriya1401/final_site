@@ -11,10 +11,10 @@ create table if not exists site_stats (
 );
 
 insert into site_stats (key, value) values
-  ('students_reached',     450),
-  ('workshops_conducted',  18),
-  ('community_partners',   7),
-  ('schools_visited',      12)
+  ('students_reached',     100),
+  ('workshops_conducted',  5),
+  ('community_partners',   6),
+  ('schools_visited',      3)
 on conflict (key) do nothing;
 
 alter table site_stats enable row level security;

@@ -8,21 +8,21 @@
     {
       "id": 1,
       "label": "Students Reached",
-      "value": 450,
+      "value": 100,
       "suffix": "+",
       "icon": "Users"
     },
     {
       "id": 2,
       "label": "Workshops Conducted",
-      "value": 18,
+      "value": 5,
       "suffix": "",
       "icon": "BookOpen"
     },
     {
       "id": 3,
       "label": "Community Partners",
-      "value": 7,
+      "value": 6,
       "suffix": "",
       "icon": "Handshake"
     }

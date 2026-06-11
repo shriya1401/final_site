@@ -168,9 +168,9 @@ function _localGetStats() {
       if (Date.now() - d._ts < 5 * 60 * 1000) return d
     }
     return JSON.parse(localStorage.getItem('ga_stats') || 'null') || {
-      students_reached: 450, workshops_conducted: 18, community_partners: 7, schools_visited: 12,
+      students_reached: 100, workshops_conducted: 4, community_partners: 6, schools_visited: 2,
     }
-  } catch { return { students_reached: 450, workshops_conducted: 18, community_partners: 7, schools_visited: 12 } }
+  } catch { return { students_reached: 100, workshops_conducted: 5, community_partners: 6, schools_visited: 3 } }
 }
 function _localSaveStats(obj) {
   try { localStorage.setItem('ga_stats', JSON.stringify(obj)); localStorage.setItem('ga_stats_cache', JSON.stringify({ ...obj, _ts: Date.now() })) } catch {}
