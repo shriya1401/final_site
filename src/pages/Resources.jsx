@@ -1,7 +1,6 @@
 // pages/Resources.jsx
 import { useState } from "react";
-import { Search, Download, FileText, Brain, Shield, Briefcase, Layers, Scale, Presentation } from "lucide-react";
-import resourcesData from "../data/resources.json";
+import { Search, Download, ExternalLink, FileText, Brain, Shield, Briefcase, Layers, Scale, Presentation } from "lucide-react";import resourcesData from "../data/resources.json";
 import SectionHeader from "../components/ui/SectionHeader";
 
 const ICON_MAP = { FileText, Brain, Shield, Briefcase, Layers, Scale, Presentation };
@@ -50,14 +49,40 @@ function ResourceCard({ resource }) {
           <span>·</span>
           <span>{resource.size}</span>
         </div>
-        <button
-          onClick={() => alert("Download coming soon — resources are being finalized!")}
-          className="flex items-center gap-1.5 text-xs font-display tracking-wide px-3 py-1.5
-                     rounded-lg bg-white/5 border border-white/10 text-white/60
-                     hover:border-cyan-400/40 hover:text-cyan-400 transition-all duration-200"
-        >
-          <Download size={12} /> Download
-        </button>
+{resource.url ? (
+  <a
+    href={resource.url}
+    target="_blank"
+    rel="noopener noreferrer"
+    className="flex items-center gap-1.5 text-xs font-display tracking-wide px-3 py-1.5
+               rounded-lg bg-white/5 border border-white/10 text-white/60
+               hover:border-cyan-400/40 hover:text-cyan-400 transition-all duration-200"
+  >
+    <ExternalLink size={12} />
+    {resource.buttonText || "Open"}
+  </a>
+) : resource.file ? (
+  <a
+    href={resource.file}
+    download
+    className="flex items-center gap-1.5 text-xs font-display tracking-wide px-3 py-1.5
+               rounded-lg bg-white/5 border border-white/10 text-white/60
+               hover:border-cyan-400/40 hover:text-cyan-400 transition-all duration-200"
+  >
+    <Download size={12} />
+    {resource.buttonText || "Download"}
+  </a>
+) : (
+  <button
+    onClick={() => alert("Download coming soon — resources are being finalized!")}
+    className="flex items-center gap-1.5 text-xs font-display tracking-wide px-3 py-1.5
+               rounded-lg bg-white/5 border border-white/10 text-white/60
+               hover:border-cyan-400/40 hover:text-cyan-400 transition-all duration-200"
+  >
+    <Download size={12} />
+    Coming Soon
+  </button>
+)}
       </div>
     </div>
   );

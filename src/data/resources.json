@@ -54,17 +54,19 @@
     "audience": ["High School"],
     "tags": ["Careers", "STEM", "AI"]
   },
-  {
-    "id": 6,
-    "title": "Smart City Vocabulary Flashcards",
-    "description": "Printable flashcards with 30 key terms in AI, sensors, and urban technology.",
-    "category": "Activity Sheets",
-    "icon": "Layers",
-    "size": "0.5 MB",
-    "format": "PDF",
-    "audience": ["Elementary", "Middle School"],
-    "tags": ["Vocabulary", "Smart City", "Activity"]
-  },
+{
+  "id": 6,
+  "title": "Smart City Vocabulary Flashcards",
+  "description": "Interactive flashcards with key terms in AI, sensors, cybersecurity, smart cities, and urban technology.",
+  "category": "Activity Sheets",
+  "icon": "Layers",
+  "size": "Online",
+  "format": "Quizlet",
+  "audience": ["Elementary", "Middle School"],
+  "tags": ["Vocabulary", "Smart City", "Activity"],
+  "url": "https://quizlet.com/1192432483/technology-and-ai-terms-flash-cards/",
+  "buttonText": "Study on Quizlet"
+},
   {
     "id": 7,
     "title": "AI Ethics Discussion Guide",
