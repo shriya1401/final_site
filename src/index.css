@@ -161,13 +161,6 @@
 ::-webkit-scrollbar-thumb { background: rgba(0,212,255,0.3); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(0,212,255,0.6); }
 
-/* Scan line */
-.scan-line {
-  position: fixed; top: 0; left: 0; right: 0; height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(0,212,255,0.4), transparent);
-  animation: scan 10s linear infinite;
-  pointer-events: none; z-index: 9999;
-}
 @keyframes scan {
   0%  { transform: translateY(0); }
   100%{ transform: translateY(100vh); }

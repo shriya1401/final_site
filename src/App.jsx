@@ -18,7 +18,6 @@ export default function App() {
   return (
     <div className={darkMode ? "dark" : ""}>
       <BrowserRouter>
-        <div className="scan-line" />
         <Navbar darkMode={darkMode} toggleDark={() => setDarkMode(d => !d)} />
         <main>
           <Routes>
