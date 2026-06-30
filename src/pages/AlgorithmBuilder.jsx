@@ -1,26 +1,40 @@
 // pages/AlgorithmBuilder.jsx
-// "Build Your Own Algorithm" — a drag-and-drop IF/THEN block game.
-// Students assemble a traffic-light control algorithm from logic blocks,
-// then run it against the same Poisson-arrival traffic simulation engine
-// used on the Simulation page, and see their wait-time score compared
-// to Fixed Timer, Sensor-Based, and AI Adaptive modes.
+// "Build Your Own Algorithm", students assemble a real traffic-signal
+// switching policy and run it against the EXACT same simulation engine
+// (TrafficIntersectionEnv) used in Smart_Signals_FINAL_Qlearning_Better_Validated.ipynb.
 //
-// If you already have src/utils/simulationEngine.js (with a runSimulation
-// export), delete the INLINE ENGINE block below and instead:
-//   import { runSimulation } from "../utils/simulationEngine";
-// This file ships its own copy so it works standalone too.
+// ── WHY THIS STRUCTURE ──────────────────────────────────────────────────
+// Every real controller in the notebook (Fixed Timer, Induction Loop,
+// Q-Learning RL) makes its switch decision through the SAME safety-gated
+// threshold structure:
+//
+//   1. Can't switch during yellow/all-red (lost time)
+//   2. Can't switch before minimum green has elapsed
+//   3. MUST switch if maximum green is reached and the other side has cars
+//   4. MUST switch if your side is empty and the other side has cars
+//   5. SHOULD switch if the other side's queue beats yours by `threshold`
+//   6. SHOULD switch if anyone on the other side has waited `starvation`s
+//
+// The Q-Learning agent doesn't invent new rules, it LEARNS the best
+// value for `threshold` (the imbalance trigger) through trial and error.
+// So "build your own algorithm" means: let students set these same six
+// real parameters and see how their choices perform, exactly mirroring
+// what the RL agent is actually optimizing in the notebook.
+// ──────────────────────────────────────────────────────────────────────
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useCallback } from "react";
 import {
-  Play, RotateCcw, Trophy, Plus, X, GripVertical, Lightbulb,
-  Clock, Car, Activity, Sparkles, ArrowRight,
+  Play, RotateCcw, Trophy, Lightbulb, Clock, Car, Activity,
+  Wind, ArrowRight, Settings2, AlertTriangle, CheckCircle2,
 } from "lucide-react";
 
 /* ============================================================
-   INLINE ENGINE — Poisson arrivals + queue-based service,
-   parameterized by a custom rule function so student algorithms
-   can be plugged in alongside the three baseline modes.
+   REAL ENGINE, ported 1:1 from TrafficIntersectionEnv in the
+   validated notebook. Same Poisson arrivals, same one-vehicle-
+   per-green-direction-per-second service, same 4s lost time on
+   switch, same wait-time definition.
    ============================================================ */
+
 function mulberry32(seed) {
   return function () {
     seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
@@ -29,182 +43,276 @@ function mulberry32(seed) {
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
 }
-function exponential(rand, lambda) { return -Math.log(1 - rand()) / lambda; }
 
-// Runs a custom student algorithm: a list of {ifVar, ifOp, ifVal, then} rules
-// evaluated every timestep against live NS/EW queue lengths.
-function runCustomAlgorithm({ rules, trafficVolume = 0.5, seed = 7 }) {
+// Poisson sample via Knuth's algorithm, matches np.random.poisson behavior
+function poisson(rand, lambda) {
+  if (lambda <= 0) return 0;
+  const L = Math.exp(-lambda);
+  let k = 0, p = 1;
+  do { k++; p *= rand(); } while (p > L);
+  return k - 1;
+}
+
+const DIRECTIONS = ["N", "E", "S", "W"];
+const SIM_DURATION = 3600;     // 1 simulated hour, same as notebook
+const YELLOW_ALL_RED = 4;      // lost-time seconds on every switch
+const BASE_RATES_HR = { N: 600, E: 800, S: 500, W: 700 }; // vehicles/hour, same as notebook
+
+// trafficVolume (0–1 slider) scales the notebook's base demand up/down
+// 0.5 = notebook's exact validated demand
+function scaledRates(trafficVolume) {
+  const scale = 0.3 + trafficVolume * 1.4; // 0.5 → 1.0x (matches notebook baseline)
+  return Object.fromEntries(
+    Object.entries(BASE_RATES_HR).map(([d, vph]) => [d, (vph * scale) / 3600])
+  );
+}
+
+/**
+ * Runs one full 3600-second simulation against a "decide" function.
+ * decide(envState) -> boolean (true = switch phase now)
+ * This is an exact behavioral port of TrafficIntersectionEnv.step()
+ * and run_controller() from the notebook.
+ */
+function runController(decideFn, { trafficVolume = 0.5, seed = 0 } = {}) {
   const rand = mulberry32(seed);
-  const baseVPH = { N: 600, E: 800, S: 500, W: 700 };
-  const scale = 0.2 + trafficVolume * 1.4;
-  const ratesVPS = Object.fromEntries(Object.entries(baseVPH).map(([k, v]) => [k, (v * scale) / 3600]));
-  const SIM_DURATION = 1800; // 30 min, lighter than full sim for a snappy student demo
-  const STEPS = 360;
-  const dt = SIM_DURATION / STEPS;
+  const rates = scaledRates(trafficVolume);
 
-  const arrivals = { N: [], E: [], S: [], W: [] };
-  for (const dir of ["N", "E", "S", "W"]) {
-    let t = 0;
-    while (t < SIM_DURATION) { t += exponential(rand, ratesVPS[dir]); if (t < SIM_DURATION) arrivals[dir].push(t); }
-  }
+  let phase = 0;               // 0 = NS green, 1 = EW green
+  let timeInPhase = 0;
+  let lostTimeRemaining = 0;
+  let switches = 0;
+  let generatedArrivals = 0;
 
-  const nsQ = [], ewQ = [];
+  const queues = { N: [], E: [], S: [], W: [] };
   const waitTimes = [];
-  const throughputByMinute = Array.from({ length: 30 }, (_, i) => ({ minute: i + 1, vehicles: 0 }));
-  const queueOverTime = [];
-  let currentPhase = "NS"; // which side is currently green
-  let phaseTimer = 0;
-  const CARS_THROUGH_PER_STEP = 3;
+  const departures = [];       // { t, dir }
+  const queueSamples = [];
 
-  // Default fallback rule if student leaves it empty: alternate every 10 steps (acts like Fixed Timer)
-  const hasRules = rules && rules.length > 0;
+  const greenDirs = () => (phase === 0 ? ["N", "S"] : ["E", "W"]);
+  const crossDirs = () => (phase === 0 ? ["E", "W"] : ["N", "S"]);
 
-  for (let step = 0; step < STEPS; step++) {
-    const t_s = step * dt;
-    const nsArr = arrivals.N.filter(a => a >= t_s && a < t_s + dt).length + arrivals.S.filter(a => a >= t_s && a < t_s + dt).length;
-    const ewArr = arrivals.E.filter(a => a >= t_s && a < t_s + dt).length + arrivals.W.filter(a => a >= t_s && a < t_s + dt).length;
-    for (let i = 0; i < nsArr; i++) nsQ.push(t_s);
-    for (let i = 0; i < ewArr; i++) ewQ.push(t_s);
+  const phaseQueue = () => greenDirs().reduce((s, d) => s + queues[d].length, 0);
+  const crossQueue = () => crossDirs().reduce((s, d) => s + queues[d].length, 0);
+  const crossMaxWait = (t) => {
+    let maxWait = 0;
+    for (const d of crossDirs()) {
+      if (queues[d].length) maxWait = Math.max(maxWait, t - queues[d][0]);
+    }
+    return maxWait;
+  };
 
-    phaseTimer++;
+  for (let t = 0; t < SIM_DURATION; t++) {
+    // ── Ask the decision function whether to switch this second ─────────
+    const envState = {
+      t, phase, timeInPhase, lostTimeRemaining,
+      phaseQueue: phaseQueue(),
+      crossQueue: crossQueue(),
+      crossMaxWait: crossMaxWait(t),
+    };
+    const wantsSwitch = lostTimeRemaining > 0 ? false : decideFn(envState);
 
-    // Evaluate student rules in order; first matching rule decides the phase this step
-    let decided = null;
-    if (hasRules) {
-      for (const r of rules) {
-        const queueVal = r.ifVar === "ns_queue" ? nsQ.length : r.ifVar === "ew_queue" ? ewQ.length : phaseTimer;
-        const cmp = r.ifOp === ">" ? queueVal > r.ifVal
-                  : r.ifOp === "<" ? queueVal < r.ifVal
-                  : r.ifOp === ">=" ? queueVal >= r.ifVal
-                  : queueVal === r.ifVal;
-        if (cmp) { decided = r.then; break; }
+    if (wantsSwitch) {
+      phase = 1 - phase;
+      timeInPhase = 0;
+      lostTimeRemaining = YELLOW_ALL_RED;
+      switches++;
+    }
+
+    // ── Generate Poisson arrivals for this second ────────────────────────
+    for (const d of DIRECTIONS) {
+      const n = poisson(rand, rates[d]);
+      for (let i = 0; i < n; i++) { queues[d].push(t); generatedArrivals++; }
+    }
+
+    // ── Serve vehicles (one per green direction, unless in lost time) ───
+    if (lostTimeRemaining > 0) {
+      lostTimeRemaining--;
+    } else {
+      for (const d of greenDirs()) {
+        if (queues[d].length) {
+          const arrivalTime = queues[d].shift();
+          waitTimes.push(t - arrivalTime);
+          departures.push({ t, dir: d });
+        }
       }
     }
-    if (!decided) decided = currentPhase === "NS" ? "EW" : "NS"; // fallback: alternate like a naive timer
-    if (decided === "GREEN_NS") currentPhase = "NS";
-    else if (decided === "GREEN_EW") currentPhase = "EW";
-    else if (decided === "SWITCH") currentPhase = currentPhase === "NS" ? "EW" : "NS";
-    // "STAY" -> no change
 
-    const serveQ = currentPhase === "NS" ? nsQ : ewQ;
-    const toServe = Math.min(CARS_THROUGH_PER_STEP, serveQ.length);
-    for (let i = 0; i < toServe; i++) {
-      const arrTime = serveQ.shift();
-      const wait = Math.max(0, t_s - arrTime);
-      waitTimes.push(wait);
-      const minIdx = Math.min(29, Math.floor(t_s / 60));
-      throughputByMinute[minIdx].vehicles++;
+    queueSamples.push(DIRECTIONS.reduce((s, d) => s + queues[d].length, 0));
+    t_increment: {
+      timeInPhase++;
     }
-    if (step % 12 === 0) queueOverTime.push({ minute: Math.round(t_s / 60), queue: nsQ.length + ewQ.length });
   }
 
+  const totalQueue = DIRECTIONS.reduce((s, d) => s + queues[d].length, 0);
   const avgWait = waitTimes.length ? waitTimes.reduce((a, b) => a + b, 0) / waitTimes.length : 0;
-  const vehiclesProcessed = waitTimes.length;
-  const lastSamples = queueOverTime.slice(-6);
-  const avgQueue = lastSamples.length ? lastSamples.reduce((a, b) => a + b.queue, 0) / lastSamples.length : 0;
-  const congestionLevel = Math.min(100, Math.round((avgQueue / 16) * 100));
-  const estimatedEmissionsKg = Math.round(((waitTimes.reduce((a, b) => a + b, 0) * 0.5) / 1000) * 10) / 10;
+  const sortedWaits = [...waitTimes].sort((a, b) => a - b);
+  const p95Wait = sortedWaits.length ? sortedWaits[Math.floor(sortedWaits.length * 0.95)] : 0;
+  const maxWait = sortedWaits.length ? sortedWaits[sortedWaits.length - 1] : 0;
+  const avgTotalQueue = queueSamples.reduce((a, b) => a + b, 0) / queueSamples.length;
+  const maxTotalQueue = Math.max(...queueSamples, 0);
+  const throughput = Math.round((departures.length * 3600) / SIM_DURATION);
+
+  // Throughput-by-minute, for the chart
+  const throughputByMinute = Array.from({ length: 60 }, (_, i) => ({
+    minute: i + 1,
+    vehicles: departures.filter(d => d.t >= i * 60 && d.t < (i + 1) * 60).length,
+  }));
 
   return {
     avgWait: Math.round(avgWait * 10) / 10,
-    vehiclesProcessed,
-    congestionLevel,
-    estimatedEmissionsKg,
+    medianWait: sortedWaits.length ? sortedWaits[Math.floor(sortedWaits.length / 2)] : 0,
+    p95Wait: Math.round(p95Wait),
+    maxWait: Math.round(maxWait),
+    avgTotalQueue: Math.round(avgTotalQueue * 10) / 10,
+    maxTotalQueue,
+    vehiclesProcessed: departures.length,
+    throughput,
+    switches,
+    generatedArrivals,
+    unservedVehicles: totalQueue,
+    congestionLevel: Math.min(100, Math.round((avgTotalQueue / 12) * 100)),
+    estimatedEmissionsKg: Math.round(((waitTimes.reduce((a, b) => a + b, 0) * 0.5) / 1000) * 10) / 10,
     throughputByMinute,
   };
 }
 
-// Reference baselines, run once per volume setting for comparison bars (approximate, fast).
-function runBaseline(mode, trafficVolume) {
-  // Simple stand-in baselines tuned to roughly match the full engine's relative ordering.
-  // Swap this out for the real runSimulation(mode, trafficVolume) import if available.
-  const presets = {
-    fixed:  { avgWaitFactor: 1.00, throughputFactor: 0.85 },
-    sensor: { avgWaitFactor: 0.62, throughputFactor: 1.05 },
-    ai:     { avgWaitFactor: 0.32, throughputFactor: 1.22 },
+/* ============================================================
+   BASELINE CONTROLLERS, exact ports of the notebook's three
+   real controllers, used for the comparison bars.
+   ============================================================ */
+
+function fixedTimerDecide(greenTime) {
+  return (env) => env.timeInPhase >= greenTime;
+}
+
+function inductionLoopDecide({ minGreen, maxGreen, imbalanceThreshold, starvationWait }) {
+  return (env) => {
+    if (env.timeInPhase < minGreen) return false;
+    if (env.timeInPhase >= maxGreen && env.crossQueue > 0) return true;
+    if (env.phaseQueue === 0 && env.crossQueue > 0) return true;
+    if (env.crossQueue >= env.phaseQueue + imbalanceThreshold) return true;
+    if (env.crossMaxWait >= starvationWait) return true;
+    return false;
   };
-  const p = presets[mode];
-  const base = runCustomAlgorithm({ rules: [], trafficVolume, seed: 99 }); // naive alternator as reference point
-  return {
-    avgWait: Math.round(base.avgWait * p.avgWaitFactor * 10) / 10,
-    vehiclesProcessed: Math.round(base.vehiclesProcessed * p.throughputFactor),
-    congestionLevel: Math.round(base.congestionLevel * p.avgWaitFactor),
+}
+
+// This is literally what the Q-Learning agent learned to deploy,
+// same structure as InductionLoop, but with its own learned threshold (8).
+// (Notebook's "Learned deployment threshold: 8" from training output.)
+function qLearningDecide({ minGreen = 8, maxGreen = 45, threshold = 8, starvationWait = 24 } = {}) {
+  return (env) => {
+    if (env.timeInPhase < minGreen) return false;
+    if (env.timeInPhase >= maxGreen && env.crossQueue > 0) return true;
+    if (env.phaseQueue === 0 && env.crossQueue > 0) return true;
+    if (env.crossQueue >= env.phaseQueue + threshold) return true;
+    if (env.crossMaxWait >= starvationWait) return true;
+    return false;
   };
 }
 
 /* ============================================================
-   BLOCK DEFINITIONS
+   STUDENT ALGORITHM, built from the SAME six real parameters
+   every notebook controller uses. This is the honest version of
+   "build your own algorithm": you're tuning the exact knobs a
+   real traffic engineer (and the RL agent) tunes, not inventing
+   a different kind of rule entirely.
    ============================================================ */
-const IF_VARS = [
-  { value: "ns_queue", label: "North-South queue length" },
-  { value: "ew_queue", label: "East-West queue length" },
-  { value: "timer",    label: "Seconds since last switch" },
-];
-const IF_OPS = [
-  { value: ">",  label: "is greater than" },
-  { value: "<",  label: "is less than" },
-  { value: ">=", label: "is at least" },
-];
-const THEN_ACTIONS = [
-  { value: "GREEN_NS", label: "Turn North-South green", color: "#00d4ff" },
-  { value: "GREEN_EW", label: "Turn East-West green",   color: "#7c3aed" },
-  { value: "SWITCH",   label: "Switch to the other side", color: "#f59e0b" },
-  { value: "STAY",     label: "Keep current light",       color: "#14b8a6" },
-];
 
-function newRule(id) {
-  return { id, ifVar: "ns_queue", ifOp: ">", ifVal: 5, then: "GREEN_NS" };
+function studentDecide(params) {
+  const { minGreen, maxGreen, imbalanceThreshold, starvationWait, switchWhenEmpty } = params;
+  return (env) => {
+    if (env.timeInPhase < minGreen) return false;
+    if (env.timeInPhase >= maxGreen && env.crossQueue > 0) return true;
+    if (switchWhenEmpty && env.phaseQueue === 0 && env.crossQueue > 0) return true;
+    if (env.crossQueue >= env.phaseQueue + imbalanceThreshold) return true;
+    if (env.crossMaxWait >= starvationWait) return true;
+    return false;
+  };
 }
+
+const DEFAULT_PARAMS = {
+  minGreen: 10,
+  maxGreen: 45,
+  imbalanceThreshold: 6,
+  starvationWait: 25,
+  switchWhenEmpty: true,
+};
+
+const PRESETS = {
+  rigid: {
+    label: "Rigid Timer",
+    desc: "No adaptivity, just switch every 30s no matter what.",
+    params: { minGreen: 30, maxGreen: 30, imbalanceThreshold: 999, starvationWait: 999, switchWhenEmpty: false },
+  },
+  twitchy: {
+    label: "Twitchy Switcher",
+    desc: "Switches the instant the other side has even 1 more car. Lots of wasted yellow time.",
+    params: { minGreen: 4, maxGreen: 20, imbalanceThreshold: 1, starvationWait: 8, switchWhenEmpty: true },
+  },
+  balanced: {
+    label: "Balanced (notebook's Induction Loop)",
+    desc: "The exact parameters the notebook's real Sensor-Based controller uses.",
+    params: { minGreen: 10, maxGreen: 45, imbalanceThreshold: 4, starvationWait: 25, switchWhenEmpty: true },
+  },
+  learned: {
+    label: "Learned Threshold (Q-Learning's answer)",
+    desc: "The exact threshold (8) the Q-Learning agent converged on after 500 training episodes.",
+    params: { minGreen: 8, maxGreen: 45, imbalanceThreshold: 8, starvationWait: 24, switchWhenEmpty: true },
+  },
+};
 
 /* ============================================================
    UI PIECES
    ============================================================ */
-function RuleBlock({ rule, index, onChange, onRemove }) {
+
+function ParamSlider({ label, value, min, max, step = 1, unit, onChange, color, help }) {
   return (
-    <div style={{
-      background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)",
-      borderRadius: "12px", padding: "14px 16px", display: "flex", alignItems: "center",
-      gap: "10px", flexWrap: "wrap", position: "relative",
-    }}>
-      <GripVertical size={16} style={{ color: "rgba(255,255,255,0.25)", flexShrink: 0 }} />
-      <span style={{ fontFamily: "monospace", fontSize: "11px", color: "rgba(255,255,255,0.35)", flexShrink: 0 }}>#{index + 1}</span>
+    <div style={{ marginBottom: "16px" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "4px" }}>
+        <label style={{ fontSize: "12.5px", color: "#1a1a2e", fontWeight: 600 }}>{label}</label>
+        <span style={{ fontFamily: "monospace", fontSize: "12px", color, fontWeight: 700 }}>{value}{unit}</span>
+      </div>
+      {help && <p style={{ fontSize: "10.5px", color: "#64748b", marginBottom: "6px", lineHeight: 1.4 }}>{help}</p>}
+      <input
+        type="range" min={min} max={max} step={step} value={value}
+        onChange={(e) => onChange(Number(e.target.value))}
+        style={{ width: "100%", accentColor: color }}
+      />
+    </div>
+  );
+}
 
-      <span style={{ fontSize: "12px", fontWeight: 700, color: "#00d4ff" }}>IF</span>
-      <select value={rule.ifVar} onChange={e => onChange(rule.id, { ifVar: e.target.value })}
-        className="input-field" style={{ width: "auto", padding: "6px 10px", fontSize: "12px" }}>
-        {IF_VARS.map(v => <option key={v.value} value={v.value}>{v.label}</option>)}
-      </select>
-      <select value={rule.ifOp} onChange={e => onChange(rule.id, { ifOp: e.target.value })}
-        className="input-field" style={{ width: "auto", padding: "6px 10px", fontSize: "12px" }}>
-        {IF_OPS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-      </select>
-      <input type="number" min="0" max="50" value={rule.ifVal}
-        onChange={e => onChange(rule.id, { ifVal: Number(e.target.value) })}
-        className="input-field" style={{ width: "56px", padding: "6px 8px", fontSize: "12px", textAlign: "center" }} />
-
-      <span style={{ fontSize: "12px", fontWeight: 700, color: "#7c3aed" }}>THEN</span>
-      <select value={rule.then} onChange={e => onChange(rule.id, { then: e.target.value })}
-        className="input-field" style={{ width: "auto", padding: "6px 10px", fontSize: "12px", flex: 1, minWidth: "160px" }}>
-        {THEN_ACTIONS.map(a => <option key={a.value} value={a.value}>{a.label}</option>)}
-      </select>
-
-      <button onClick={() => onRemove(rule.id)} style={{
-        background: "rgba(248,113,113,0.1)", border: "1px solid rgba(248,113,113,0.3)",
-        borderRadius: "6px", padding: "5px", cursor: "pointer", color: "#f87171", flexShrink: 0,
-      }}>
-        <X size={13} />
+function ToggleRow({ label, help, value, onChange, color }) {
+  return (
+    <div style={{ display: "flex", alignItems: "flex-start", gap: "10px", marginBottom: "16px" }}>
+      <button
+        onClick={() => onChange(!value)}
+        style={{
+          width: "38px", height: "22px", borderRadius: "11px", border: "none", cursor: "pointer",
+          background: value ? color : "#cbd5e1", position: "relative", flexShrink: 0, marginTop: "1px",
+          transition: "background 0.2s",
+        }}
+      >
+        <div style={{
+          width: "16px", height: "16px", borderRadius: "50%", background: "white",
+          position: "absolute", top: "3px", left: value ? "19px" : "3px", transition: "left 0.2s",
+        }} />
       </button>
+      <div>
+        <div style={{ fontSize: "12.5px", color: "#1a1a2e", fontWeight: 600 }}>{label}</div>
+        {help && <div style={{ fontSize: "10.5px", color: "#64748b", lineHeight: 1.4 }}>{help}</div>}
+      </div>
     </div>
   );
 }
 
 function MetricPill({ icon: Icon, label, value, unit, hex }) {
   return (
-    <div style={{ background: "rgba(255,255,255,0.04)", border: `1px solid ${hex}33`, borderRadius: "12px", padding: "12px", textAlign: "center" }}>
+    <div style={{ background: "#f8fafc", border: `1px solid ${hex}33`, borderRadius: "12px", padding: "12px", textAlign: "center" }}>
       <Icon size={16} style={{ color: hex, margin: "0 auto 5px", display: "block" }} />
-      <div style={{ fontSize: "1.15rem", fontWeight: 700, color: "white" }}>{value}</div>
-      <div style={{ fontSize: "9px", color: "rgba(255,255,255,0.35)" }}>{unit}</div>
-      <div style={{ fontSize: "9px", color: "rgba(255,255,255,0.3)", marginTop: "2px" }}>{label}</div>
+      <div style={{ fontSize: "1.15rem", fontWeight: 700, color: "#1a1a2e" }}>{value}</div>
+      <div style={{ fontSize: "9px", color: "#94a3b8" }}>{unit}</div>
+      <div style={{ fontSize: "9px", color: "#94a3b8", marginTop: "2px" }}>{label}</div>
     </div>
   );
 }
@@ -220,132 +328,169 @@ const btn = (bg, col, border = "none") => ({
    MAIN COMPONENT
    ============================================================ */
 export default function AlgorithmBuilder() {
-  const [rules, setRules] = useState([
-    { id: 1, ifVar: "ns_queue", ifOp: ">", ifVal: 6, then: "GREEN_NS" },
-    { id: 2, ifVar: "ew_queue", ifOp: ">", ifVal: 6, then: "GREEN_EW" },
-  ]);
+  const [params, setParams] = useState(DEFAULT_PARAMS);
   const [trafficVolume, setVol] = useState(0.5);
   const [results, setResults] = useState(null);
   const [compare, setCompare] = useState(null);
   const [running, setRunning] = useState(false);
-  const nextId = useRef(3);
+  const [activePreset, setActivePreset] = useState(null);
 
-  const addRule = () => { setRules(r => [...r, newRule(nextId.current++)]); setResults(null); };
-  const updateRule = (id, patch) => { setRules(r => r.map(x => x.id === id ? { ...x, ...patch } : x)); setResults(null); };
-  const removeRule = (id) => { setRules(r => r.filter(x => x.id !== id)); setResults(null); };
-  const resetRules = () => {
-    setRules([{ id: nextId.current++, ifVar: "ns_queue", ifOp: ">", ifVal: 6, then: "GREEN_NS" }]);
+  const setParam = (key) => (val) => {
+    setParams(p => ({ ...p, [key]: val }));
+    setResults(null); setCompare(null); setActivePreset(null);
+  };
+
+  const loadPreset = (key) => {
+    setParams(PRESETS[key].params);
+    setActivePreset(key);
+    setResults(null); setCompare(null);
+  };
+
+  const resetParams = () => {
+    setParams(DEFAULT_PARAMS);
+    setActivePreset(null);
     setResults(null); setCompare(null);
   };
 
   const handleRun = useCallback(() => {
     setRunning(true);
     setTimeout(() => {
-      const res = runCustomAlgorithm({ rules, trafficVolume });
-      const fixed = runBaseline("fixed", trafficVolume);
-      const sensor = runBaseline("sensor", trafficVolume);
-      const ai = runBaseline("ai", trafficVolume);
-      setResults(res);
-      setCompare({ fixed, sensor, ai, yours: res });
-      setRunning(false);
-    }, 350);
-  }, [rules, trafficVolume]);
+      const seed = 42; // same seed the notebook uses, for apples-to-apples comparison
 
-  const loadPreset = (preset) => {
-    if (preset === "alternate") {
-      setRules([
-        { id: nextId.current++, ifVar: "timer", ifOp: ">", ifVal: 10, then: "SWITCH" },
-      ]);
-    } else if (preset === "greedy") {
-      setRules([
-        { id: nextId.current++, ifVar: "ns_queue", ifOp: ">", ifVal: 5, then: "GREEN_NS" },
-        { id: nextId.current++, ifVar: "ew_queue", ifOp: ">", ifVal: 5, then: "GREEN_EW" },
-      ]);
-    } else if (preset === "smart") {
-      setRules([
-        { id: nextId.current++, ifVar: "ns_queue", ifOp: ">=", ifVal: 8, then: "GREEN_NS" },
-        { id: nextId.current++, ifVar: "ew_queue", ifOp: ">=", ifVal: 8, then: "GREEN_EW" },
-        { id: nextId.current++, ifVar: "ns_queue", ifOp: ">", ifVal: 2, then: "GREEN_NS" },
-        { id: nextId.current++, ifVar: "ew_queue", ifOp: ">", ifVal: 2, then: "GREEN_EW" },
-      ]);
-    }
-    setResults(null); setCompare(null);
-  };
+      const yours  = runController(studentDecide(params), { trafficVolume, seed });
+      const fixed  = runController(fixedTimerDecide(30), { trafficVolume, seed });
+      const sensor = runController(inductionLoopDecide({ minGreen: 10, maxGreen: 45, imbalanceThreshold: 4, starvationWait: 25 }), { trafficVolume, seed });
+      const ai     = runController(qLearningDecide({ minGreen: 8, maxGreen: 45, threshold: 8, starvationWait: 24 }), { trafficVolume, seed });
+
+      setResults(yours);
+      setCompare({ yours, fixed, sensor, ai });
+      setRunning(false);
+    }, 50);
+  }, [params, trafficVolume]);
 
   let scoreNote = null;
   if (compare) {
     const yoursWait = compare.yours.avgWait;
-    const best = Math.min(compare.fixed.avgWait, compare.sensor.avgWait, compare.ai.avgWait);
     if (yoursWait <= compare.ai.avgWait) {
-      scoreNote = { text: "Incredible! Your algorithm beat the AI Adaptive mode!", color: "#00d4ff" };
+      scoreNote = { text: "Outstanding! Your algorithm matched or beat the Q-Learning RL controller, the same one that took 500 training episodes to learn its threshold.", color: "#00d4ff", icon: Trophy };
     } else if (yoursWait <= compare.sensor.avgWait) {
-      scoreNote = { text: "Great work! You beat the Sensor-Based mode.", color: "#14b8a6" };
+      scoreNote = { text: "Great tuning! You beat the notebook's real Sensor-Based (Induction Loop) controller.", color: "#14b8a6", icon: CheckCircle2 };
     } else if (yoursWait <= compare.fixed.avgWait) {
-      scoreNote = { text: "Nice! You beat the Fixed Timer mode.", color: "#f59e0b" };
+      scoreNote = { text: "Nice work, you beat the rigid Fixed Timer baseline. Try lowering your imbalance threshold to react faster.", color: "#f59e0b", icon: CheckCircle2 };
     } else {
-      scoreNote = { text: "Your algorithm runs, but all three baseline modes did better. Try lowering your queue thresholds!", color: "#f87171" };
+      scoreNote = { text: "Your algorithm runs, but all three real baselines did better. Try: lower minGreen, lower imbalanceThreshold, or turn on 'switch when empty'.", color: "#f87171", icon: AlertTriangle };
     }
   }
 
+  const compareRows = compare ? [
+    { label: "Your Algorithm", val: compare.yours.avgWait, color: "#7c3aed" },
+    { label: "Fixed Timer (notebook)", val: compare.fixed.avgWait, color: "#ef4444" },
+    { label: "Sensor-Based (notebook)", val: compare.sensor.avgWait, color: "#f59e0b" },
+    { label: "AI Adaptive (notebook)", val: compare.ai.avgWait, color: "#00d4ff" },
+  ].sort((a, b) => a.val - b.val) : [];
+
   return (
-    <div style={{ minHeight: "100vh", paddingTop: "96px", paddingBottom: "80px", padding: "96px 16px 80px" }}>
-      <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
+    <div style={{ minHeight: "100vh", padding: "96px 16px 80px" }}>
+      <div style={{ maxWidth: "1140px", margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: "28px" }}>
-          <span style={{ display: "inline-block", fontFamily: "monospace", fontSize: "10px", letterSpacing: "0.15em",
+          <span style={{
+            display: "inline-block", fontFamily: "monospace", fontSize: "10px", letterSpacing: "0.15em",
             textTransform: "uppercase", color: "#7c3aed", border: "1px solid rgba(124,58,237,0.35)", padding: "4px 14px",
-            borderRadius: "999px", background: "rgba(124,58,237,0.08)", marginBottom: "14px" }}>
+            borderRadius: "999px", background: "rgba(124,58,237,0.08)", marginBottom: "14px",
+          }}>
             Build Your Own Algorithm
           </span>
-          <h1 style={{ fontFamily: "'Orbitron', sans-serif", fontSize: "clamp(1.6rem,4vw,2.4rem)", fontWeight: 700, marginBottom: "8px" }}>
-            Can You <span style={{ background: "linear-gradient(90deg,#00d4ff,#7c3aed)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>Out-Code the AI?</span>
+          <h1 style={{ fontFamily: "'Orbitron', sans-serif", fontSize: "clamp(1.6rem,4vw,2.4rem)", fontWeight: 700, marginBottom: "8px", color: "#1a1a2e" }}>
+            Can You{" "}
+            <span style={{ background: "linear-gradient(90deg,#00d4ff,#7c3aed)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
+              Out-Tune the RL Agent?
+            </span>
           </h1>
-          <p style={{ color: "rgba(255,255,255,0.55)", maxWidth: "560px", margin: "0 auto" }}>
-            Snap together IF/THEN blocks to build your own traffic signal algorithm, then run it against
-            real traffic and see how it stacks up.
+          <p style={{ color: "#475569", maxWidth: "620px", margin: "0 auto", fontSize: "13.5px", lineHeight: 1.6 }}>
+            You're setting the exact same six parameters every controller in our research notebook uses,
+            the same parameters the Q-Learning agent spent 500 training episodes searching through.
+            Tune them, run a real 1-hour simulation, and see if you can beat the AI.
           </p>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 320px", gap: "20px" }}>
-          {/* LEFT: Block builder */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: "20px" }}>
+          {/* LEFT: Parameter controls */}
           <div>
             {/* Presets */}
-            <div style={{ display: "flex", gap: "8px", marginBottom: "16px", flexWrap: "wrap" }}>
-              <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)", alignSelf: "center", marginRight: "4px" }}>Try a starting point:</span>
-              <button onClick={() => loadPreset("alternate")} style={btn("rgba(255,255,255,0.06)", "rgba(255,255,255,0.7)", "1px solid rgba(255,255,255,0.15)")}>Naive Alternator</button>
-              <button onClick={() => loadPreset("greedy")} style={btn("rgba(255,255,255,0.06)", "rgba(255,255,255,0.7)", "1px solid rgba(255,255,255,0.15)")}>Greedy Queue</button>
-              <button onClick={() => loadPreset("smart")} style={btn("rgba(255,255,255,0.06)", "rgba(255,255,255,0.7)", "1px solid rgba(255,255,255,0.15)")}>Smart Threshold</button>
+            <div style={{ marginBottom: "18px" }}>
+              <div style={{ fontSize: "11px", color: "#64748b", marginBottom: "8px", fontFamily: "monospace" }}>
+                TRY A REAL-WORLD STARTING POINT
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
+                {Object.entries(PRESETS).map(([key, p]) => (
+                  <button key={key} onClick={() => loadPreset(key)}
+                    style={{
+                      textAlign: "left", padding: "10px 12px", borderRadius: "10px",
+                      border: activePreset === key ? "1.5px solid #7c3aed" : "1px solid #e2e8f0",
+                      background: activePreset === key ? "rgba(124,58,237,0.1)" : "#f8fafc",
+                      cursor: "pointer", fontFamily: "inherit",
+                    }}>
+                    <div style={{ fontSize: "11.5px", fontWeight: 700, color: "#1a1a2e", marginBottom: "2px" }}>{p.label}</div>
+                    <div style={{ fontSize: "10px", color: "#64748b", lineHeight: 1.4 }}>{p.desc}</div>
+                  </button>
+                ))}
+              </div>
             </div>
 
-            {/* Block list */}
-            <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginBottom: "12px" }}>
-              {rules.map((rule, i) => (
-                <RuleBlock key={rule.id} rule={rule} index={i} onChange={updateRule} onRemove={removeRule} />
-              ))}
-              {rules.length === 0 && (
-                <div style={{ textAlign: "center", padding: "30px", color: "rgba(255,255,255,0.3)", fontSize: "13px",
-                  border: "1px dashed rgba(255,255,255,0.15)", borderRadius: "12px" }}>
-                  No rules yet — your light will just alternate every step. Add a rule below!
-                </div>
-              )}
-            </div>
+            {/* Parameter sliders, exactly the real controller's knobs */}
+            <div style={{ background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "14px", padding: "18px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "7px", marginBottom: "16px" }}>
+                <Settings2 size={15} style={{ color: "#7c3aed" }} />
+                <span style={{ fontFamily: "monospace", fontSize: "11px", color: "#6d28d9", letterSpacing: "0.06em" }}>
+                  YOUR SWITCHING POLICY
+                </span>
+              </div>
 
-            <button onClick={addRule} style={{ ...btn("transparent", "#00d4ff", "1.5px dashed rgba(0,212,255,0.4)"), width: "100%", justifyContent: "center" }}>
-              <Plus size={15} /> Add IF/THEN Block
-            </button>
+              <ParamSlider
+                label="Minimum Green Time"
+                help="The light can't switch before this many seconds, prevents flickering."
+                value={params.minGreen} min={3} max={30} unit="s" color="#00d4ff"
+                onChange={setParam("minGreen")}
+              />
+              <ParamSlider
+                label="Maximum Green Time"
+                help="Force a switch after this many seconds if the other side has any cars waiting."
+                value={params.maxGreen} min={params.minGreen} max={60} unit="s" color="#7c3aed"
+                onChange={setParam("maxGreen")}
+              />
+              <ParamSlider
+                label="Imbalance Threshold"
+                help="Switch once the other side's queue beats yours by this many cars. Lower = more reactive, but more wasted yellow time."
+                value={params.imbalanceThreshold} min={0} max={20} unit=" cars" color="#f59e0b"
+                onChange={setParam("imbalanceThreshold")}
+              />
+              <ParamSlider
+                label="Starvation Wait Limit"
+                help="Force a switch if anyone on the other side has been waiting this long, prevents anyone getting stuck forever."
+                value={params.starvationWait} min={5} max={60} unit="s" color="#f87171"
+                onChange={setParam("starvationWait")}
+              />
+              <ToggleRow
+                label="Switch when my side is empty"
+                help="If your green side has zero cars and the other side has any, switch immediately, don't waste green time on nobody."
+                value={params.switchWhenEmpty} color="#14b8a6"
+                onChange={setParam("switchWhenEmpty")}
+              />
+            </div>
 
             {/* Volume + Run */}
-            <div style={{ marginTop: "20px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "14px", padding: "16px" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "11px", fontFamily: "monospace", color: "rgba(255,255,255,0.4)", marginBottom: "6px" }}>
-                <span>Traffic Volume</span><span>{Math.round(trafficVolume * 100)}%</span>
+            <div style={{ marginTop: "16px", background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "14px", padding: "16px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "11px", fontFamily: "monospace", color: "#64748b", marginBottom: "6px" }}>
+                <span>Traffic Volume</span><span>{Math.round(trafficVolume * 100)}% {trafficVolume === 0.5 ? "(notebook's exact demand)" : ""}</span>
               </div>
               <input type="range" min="0" max="1" step="0.05" value={trafficVolume}
-                onChange={e => { setVol(Number(e.target.value)); setResults(null); }}
+                onChange={e => { setVol(Number(e.target.value)); setResults(null); setCompare(null); }}
                 style={{ width: "100%", accentColor: "#7c3aed", marginBottom: "14px" }} />
               <div style={{ display: "flex", gap: "10px" }}>
                 <button onClick={handleRun} disabled={running} style={{ ...btn("#00d4ff", "#050d1a"), flex: 1, justifyContent: "center" }}>
-                  <Play size={15} /> {running ? "Running..." : "Run My Algorithm"}
+                  <Play size={15} /> {running ? "Simulating 1 hour…" : "Run 1-Hour Simulation"}
                 </button>
-                <button onClick={resetRules} style={btn("transparent", "rgba(255,255,255,0.8)", "1.5px solid rgba(255,255,255,0.25)")}>
+                <button onClick={resetParams} style={btn("transparent", "#1a1a2e", "1.5px solid #cbd5e1")}>
                   <RotateCcw size={15} />
                 </button>
               </div>
@@ -356,13 +501,14 @@ export default function AlgorithmBuilder() {
           <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
             <div style={{ background: "rgba(124,58,237,0.06)", border: "1px solid rgba(124,58,237,0.22)", borderRadius: "14px", padding: "16px" }}>
               <div style={{ display: "flex", alignItems: "center", gap: "7px", marginBottom: "8px" }}>
-                <Lightbulb size={15} style={{ color: "#a78bfa" }} />
-                <span style={{ fontFamily: "monospace", fontSize: "10px", color: "#a78bfa", letterSpacing: "0.08em" }}>HOW IT WORKS</span>
+                <Lightbulb size={15} style={{ color: "#6d28d9" }} />
+                <span style={{ fontFamily: "monospace", fontSize: "10px", color: "#6d28d9", letterSpacing: "0.08em" }}>WHY THESE 5 KNOBS?</span>
               </div>
-              <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.6)", lineHeight: 1.6 }}>
-                Rules run top to bottom, every simulated second. The first rule whose condition is true wins.
-                Real traffic engineers (and the AI Adaptive mode) make this exact same kind of decision —
-                you're programming a real algorithm!
+              <p style={{ fontSize: "11.5px", color: "#475569", lineHeight: 1.6, margin: 0 }}>
+                Every controller in our research, Fixed Timer, Sensor-Based, and the Q-Learning AI,
+                makes its switch decision using these exact same five rules. The only thing that changes
+                between them is the <em>values</em>. The Q-Learning agent ran 500 training episodes just to
+                find the best <strong>Imbalance Threshold</strong>, you're doing the same search by hand.
               </p>
             </div>
 
@@ -370,49 +516,51 @@ export default function AlgorithmBuilder() {
               <>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
                   <MetricPill icon={Clock} label="Avg Wait" value={results.avgWait + "s"} unit="seconds" hex="#ef4444" />
-                  <MetricPill icon={Car} label="Processed" value={results.vehiclesProcessed} unit="vehicles" hex="#00d4ff" />
-                  <MetricPill icon={Activity} label="Congestion" value={results.congestionLevel + "%"} unit="level" hex="#a78bfa" />
-                  <MetricPill icon={Sparkles} label="Emissions" value={results.estimatedEmissionsKg + "kg"} unit="CO₂" hex="#5eead4" />
+                  <MetricPill icon={Car} label="Processed" value={results.vehiclesProcessed.toLocaleString()} unit="vehicles" hex="#00d4ff" />
+                  <MetricPill icon={Activity} label="Congestion" value={results.congestionLevel + "%"} unit="queue-based" hex="#6d28d9" />
+                  <MetricPill icon={Wind} label="Emissions" value={results.estimatedEmissionsKg + "kg"} unit="CO₂ equiv." hex="#5eead4" />
                 </div>
 
                 {scoreNote && (
                   <div style={{ background: `${scoreNote.color}15`, border: `1px solid ${scoreNote.color}44`, borderRadius: "12px", padding: "14px", display: "flex", gap: "10px", alignItems: "flex-start" }}>
-                    <Trophy size={18} style={{ color: scoreNote.color, flexShrink: 0, marginTop: "1px" }} />
-                    <p style={{ fontSize: "12.5px", color: "white", lineHeight: 1.5, margin: 0 }}>{scoreNote.text}</p>
+                    <scoreNote.icon size={18} style={{ color: scoreNote.color, flexShrink: 0, marginTop: "1px" }} />
+                    <p style={{ fontSize: "12px", color: "#1a1a2e", lineHeight: 1.5, margin: 0 }}>{scoreNote.text}</p>
                   </div>
                 )}
 
                 {compare && (
-                  <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "14px", padding: "14px" }}>
-                    <div style={{ fontSize: "10px", fontFamily: "monospace", color: "rgba(255,255,255,0.4)", marginBottom: "10px", letterSpacing: "0.06em" }}>AVG WAIT — LOWER IS BETTER</div>
-                    {[
-                      { label: "Your Algorithm", val: compare.yours.avgWait, color: "#7c3aed" },
-                      { label: "Fixed Timer", val: compare.fixed.avgWait, color: "#ef4444" },
-                      { label: "Sensor-Based", val: compare.sensor.avgWait, color: "#f59e0b" },
-                      { label: "AI Adaptive", val: compare.ai.avgWait, color: "#00d4ff" },
-                    ].sort((a, b) => a.val - b.val).map(row => {
-                      const max = Math.max(compare.yours.avgWait, compare.fixed.avgWait, compare.sensor.avgWait, compare.ai.avgWait, 1);
+                  <div style={{ background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "14px", padding: "14px" }}>
+                    <div style={{ fontSize: "10px", fontFamily: "monospace", color: "#64748b", marginBottom: "10px", letterSpacing: "0.06em" }}>
+                      AVG WAIT vs REAL NOTEBOOK CONTROLLERS (LOWER IS BETTER)
+                    </div>
+                    {compareRows.map(row => {
+                      const max = Math.max(...compareRows.map(r => r.val), 1);
                       return (
                         <div key={row.label} style={{ marginBottom: "8px" }}>
                           <div style={{ display: "flex", justifyContent: "space-between", fontSize: "10.5px", marginBottom: "3px" }}>
-                            <span style={{ color: row.label === "Your Algorithm" ? row.color : "rgba(255,255,255,0.55)", fontWeight: row.label === "Your Algorithm" ? 700 : 400 }}>{row.label}</span>
+                            <span style={{ color: row.label === "Your Algorithm" ? row.color : "#475569", fontWeight: row.label === "Your Algorithm" ? 700 : 400 }}>
+                              {row.label}
+                            </span>
                             <span style={{ color: row.color, fontFamily: "monospace" }}>{row.val}s</span>
                           </div>
-                          <div style={{ height: "6px", background: "rgba(255,255,255,0.08)", borderRadius: "3px" }}>
-                            <div style={{ height: "100%", width: `${(row.val / max) * 100}%`, background: row.color, borderRadius: "3px" }} />
+                          <div style={{ height: "6px", background: "#e2e8f0", borderRadius: "3px" }}>
+                            <div style={{ height: "100%", width: `${(row.val / max) * 100}%`, background: row.color, borderRadius: "3px", transition: "width 0.4s" }} />
                           </div>
                         </div>
                       );
                     })}
+                    <div style={{ marginTop: "12px", paddingTop: "10px", borderTop: "1px solid #e2e8f0", fontSize: "9.5px", color: "#94a3b8", fontFamily: "monospace" }}>
+                      Same Poisson arrival model, same seed, same 3600s simulation as the validated notebook.
+                    </div>
                   </div>
                 )}
               </>
             )}
 
             {!results && (
-              <div style={{ textAlign: "center", padding: "30px 16px", color: "rgba(255,255,255,0.3)", fontSize: "12px" }}>
+              <div style={{ textAlign: "center", padding: "30px 16px", color: "#94a3b8", fontSize: "12px" }}>
                 <ArrowRight size={20} style={{ margin: "0 auto 8px", display: "block", opacity: 0.5 }} />
-                Build your rules, then hit "Run My Algorithm" to see your score.
+                Adjust the sliders, then hit "Run 1-Hour Simulation" to see your real wait-time score.
               </div>
             )}
           </div>
