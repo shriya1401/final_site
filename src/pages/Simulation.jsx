@@ -56,12 +56,24 @@ function phaseDuration(ph, mode, nsQ, ewQ) {
   return Math.min(AI_MAX_F, Math.max(AI_MIN_F, AI_MIN_F + q * 8));
 }
 
+// Validated 30-seed averaged results from Smart_Signals_FINAL_Qlearning_Better_Validated.ipynb
+// Base values are the notebook's actual measured output at default demand (v≈0.5).
+// We scale lightly with the volume slider so the UI still feels responsive,
+// while staying anchored to the real notebook numbers at the midpoint.
+const VALIDATED = {
+  fixed:  { wait: 12.45, vehicles: 2586, congestion: 35 },
+  sensor: { wait: 6.78,  vehicles: 2591, congestion: 19 },
+  ai:     { wait: 6.22,  vehicles: 2591, congestion: 17 },
+};
+
 function calibrate(res, mode, v) {
-  let w = res.avgWait;
-  if (mode === "fixed")  w = Math.round((18  + v * 11) * 10) / 10;
-  if (mode === "sensor") w = Math.round((11  + v * 7)  * 10) / 10;
-  if (mode === "ai")     w = Math.round((2.0 + v * 1.0)* 10) / 10;
-  return { ...res, avgWait: w };
+  const base = VALIDATED[mode] || VALIDATED.fixed;
+  // v ranges 0–1, notebook demand corresponds to v≈0.5 (midpoint)
+  // Scale ±35% around the notebook baseline as volume moves away from 0.5
+  const scaleFactor = 0.65 + v * 0.7; // 0.65x at v=0, 1.0x at v=0.5, 1.35x at v=1
+  const w = Math.round(base.wait * scaleFactor * 10) / 10;
+  const congestion = Math.min(100, Math.round(base.congestion * scaleFactor));
+  return { ...res, avgWait: w, congestionLevel: congestion, vehiclesProcessed: base.vehicles };
 }
 
 function IntersectionCanvas({ mode, running, trafficVolume }) {
@@ -605,14 +617,16 @@ export default function Simulation() {
               </GlassCard>
             )}
 
-            <div className="glass p-4 rounded-xl border border-teal/20 text-sm text-white/60">
+<div className="glass p-4 rounded-xl border border-teal/20 text-sm text-white/60">
               <div className="flex items-center gap-2 mb-2">
                 <Info size={14} className="text-teal"/>
-                <span className="font-display text-xs text-teal tracking-wide">REAL IMPACT</span>
+                <span className="font-display text-xs text-teal tracking-wide">VALIDATED RESULTS</span>
               </div>
-              Pittsburgh's SURTRAC AI traffic system reduced travel time by{" "}
-              <span className="text-teal font-semibold">25%</span> and emissions by{" "}
-              <span className="text-teal font-semibold">21%</span> across 50 intersections.
+              Across a 30-seed averaged simulation, Q-Learning RL cut average wait time by{" "}
+              <span className="text-teal font-semibold">50%</span> vs Fixed Timer and{" "}
+              <span className="text-teal font-semibold">8.3%</span> vs Sensor-Based — while also
+              reducing average queue congestion to just{" "}
+              <span className="text-teal font-semibold">17%</span>.
             </div>
           </div>
         </div>
