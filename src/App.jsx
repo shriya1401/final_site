@@ -12,6 +12,8 @@ import Resources     from "./pages/Resources";
 import Impact        from "./pages/Impact";
 import About         from "./pages/About";
 import EventFeedback from "./pages/EventFeedback";
+import Certificate from "./pages/Certificate";
+import AlgorithmBuilder from "./pages/AlgorithmBuilder";
 
 export default function App() {
   const [darkMode, setDarkMode] = useState(true);
@@ -30,6 +32,8 @@ export default function App() {
             <Route path="/impact"     element={<Impact />} />
             <Route path="/about"      element={<About />} />
             <Route path="/feedback"   element={<EventFeedback />} />
+            <Route path="/certificate" element={<Certificate />} />
+            <Route path="/algorithm-builder" element={<AlgorithmBuilder />} />
           </Routes>
         </main>
         <Footer />

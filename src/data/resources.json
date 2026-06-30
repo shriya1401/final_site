@@ -19,6 +19,7 @@
     "size": "1.1 MB",
     "format": "PDF",
     "audience": ["Elementary", "Middle School"],
+      "file": "/resources/Fixed-Timer-vs-AI-Activity-Sheet.pdf",
     "tags": ["Activity", "Traffic", "Simulation"]
   },
   {
@@ -30,6 +31,7 @@
     "size": "2.3 MB",
     "format": "PDF",
     "audience": ["Elementary", "Middle School"],
+    "file": "/resources/Introduction-to-Machine-Learning-Lesson-Plan.pdf",
     "tags": ["AI", "Machine Learning", "Lesson Plan"]
   },
   {
@@ -41,6 +43,7 @@
     "size": "0.8 MB",
     "format": "PDF",
     "audience": ["Middle School", "High School"],
+      "file": "/resources/Cybersecurity-Basics-Handout.pdf",
     "tags": ["Cybersecurity", "Safety", "Privacy"]
   },
   {
@@ -52,6 +55,7 @@
     "size": "3.5 MB",
     "format": "PDF",
     "audience": ["High School"],
+    "file": "/resources/STEM-Careers-in-AI-and-Transportation.pdf",
     "tags": ["Careers", "STEM", "AI"]
   },
 {
@@ -76,6 +80,7 @@
     "size": "1.9 MB",
     "format": "PDF",
     "audience": ["High School"],
+    "file": "/resources/AI-Ethics-Discussion-Guide.pdf",
     "tags": ["Ethics", "AI", "Discussion"]
   },
   {
@@ -87,6 +92,72 @@
     "size": "0.3 MB",
     "format": "PDF",
     "audience": ["Community"],
+     "file": "/resources/Parent-and-Community-Info-Sheet.pdf",
     "tags": ["Community", "Gold Award", "Overview"]
-  }
+  },
+  {
+  "id": 9,
+  "title": "AI Scavenger Hunt",
+  "description": "A take-home family activity where students find examples of AI in everyday life, from voice assistants to navigation apps.",
+  "category": "Games & Challenges",
+  "icon": "Brain",
+  "size": "PDF",
+  "format": "Activity",
+  "audience": ["Elementary", "Middle School", "High School"],
+  "tags": ["AI", "Family Activity", "Scavenger Hunt"],
+  "file": "/resources/AI-Scavenger-Hunt.pdf",
+  "buttonText": "Download"
+},
+{
+  "id": 10,
+  "title": "Cybersecurity Escape Room Challenge",
+  "description": "A team-based cybersecurity puzzle where students decode messages, spot phishing, rank passwords, and unlock a final code.",
+  "category": "Games & Challenges",
+  "icon": "Shield",
+  "size": "PDF",
+  "format": "Challenge",
+  "audience": ["Middle School", "High School"],
+  "tags": ["Cybersecurity", "Escape Room", "Phishing", "Passwords"],
+  "file": "/resources/Cybersecurity-Escape-Room-Challenge.pdf",
+  "buttonText": "Download"
+},
+{
+  "id": 11,
+  "title": "Build a Traffic Light Craft",
+  "description": "A hands-on paper traffic light craft and partner game that teaches signal logic and how AI chooses which road gets green.",
+  "category": "Games & Challenges",
+  "icon": "Layers",
+  "size": "PDF",
+  "format": "Craft",
+  "audience": ["Elementary", "Middle School"],
+  "tags": ["Traffic Light", "Craft", "AI Simulation", "Hands-On"],
+  "file": "/resources/Build-a-Traffic-Light-Craft.pdf",
+  "buttonText": "Download"
+},
+{
+  "id": 12,
+  "title": "Build Your Own Algorithm",
+  "description": "An interactive IF/THEN traffic-light game where students design their own signal algorithm and compare it to fixed timer, sensor-based, and AI adaptive modes.",
+  "category": "Games & Challenges",
+  "icon": "Brain",
+  "size": "Interactive",
+  "format": "Web Tool",
+  "audience": ["Middle School", "High School"],
+  "tags": ["Algorithm", "Traffic Simulation", "AI", "Logic"],
+  "url": "/algorithm-builder",
+  "buttonText": "Open Tool"
+},
+{
+  "id": 13,
+  "title": "Certificates & Badges",
+  "description": "A student certificate generator and badge tracker for completing the AI, cybersecurity, and traffic simulation learning tracks.",
+  "category": "Community Resources",
+  "icon": "Award",
+  "size": "Interactive",
+  "format": "Web Tool",
+  "audience": ["Elementary", "Middle School", "High School"],
+  "tags": ["Certificate", "Badges", "Achievement", "Workshop"],
+  "url": "/certificate",
+  "buttonText": "Open Certificates"
+}
 ]
