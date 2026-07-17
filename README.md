@@ -5,7 +5,7 @@ A fully interactive, production-ready website built with React + Vite + Tailwind
 
 ---
 
-## 🚀 Quick Start
+##  Quick Start
 
 ```bash
 # 1. Install dependencies
@@ -23,7 +23,7 @@ npm run preview
 
 ---
 
-## 📁 Project Structure
+##  Project Structure
 
 ```
 src/
@@ -59,7 +59,7 @@ src/
 
 ---
 
-## 🧠 Simulation Engine
+## Simulation Engine
 
 The traffic simulation (`src/utils/simulationEngine.js`) is a direct JavaScript translation of the three Python notebooks from the Gold Award project:
 
@@ -71,7 +71,7 @@ The traffic simulation (`src/utils/simulationEngine.js`) is a direct JavaScript 
 
 ---
 
-## ☁️ Deploy to Vercel
+##  Deploy to Vercel
 
 ```bash
 # Install Vercel CLI
@@ -93,14 +93,4 @@ Add this `vercel.json` for client-side routing:
 }
 ```
 
----
-
-## 🔮 Future Backend Integration
-
-1. **Workshop request form** → Connect to Supabase or Airtable via their REST APIs
-2. **Newsletter signup** → Integrate Mailchimp or ConvertKit API  
-3. **Resource downloads** → Host files on S3/Cloudflare R2, update download links in `resources.json`
-4. **Analytics** → Add Plausible or Google Analytics 4 to `index.html`
-5. **CMS** → Replace JSON files with Contentful or Sanity for easy content updates
-6. **Auth** → Add Supabase Auth if you want a teacher portal for tracking downloads
 
