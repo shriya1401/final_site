@@ -184,7 +184,7 @@ function FeedbackForm({ onSuccess }) {
       if (ok) {
         onSuccess({ gradeLevel, workshopName, preRatings, postRatings, postOnlyRatings, metrics })
       } else {
-        setError('Submission failed — please try again.')
+        setError('Submission failed, please try again.')
       }
     } catch (err) {
       setError('Something went wrong. Please try again.')
@@ -207,7 +207,7 @@ function FeedbackForm({ onSuccess }) {
         <div>
           <label className="font-mono text-xs text-white/50 mb-1 block">Workshop / Event Name</label>
           <input value={workshopName} onChange={e => setWorkshopName(e.target.value)}
-            placeholder="e.g. Lincoln Middle — AI Workshop" className="input-field" />
+            placeholder="e.g. Lincoln Middle AI Workshop" className="input-field" />
         </div>
         <div>
           <label className="font-mono text-xs text-white/50 mb-1 block">
@@ -518,7 +518,7 @@ function AdminPanel({ currentCount, onCountUpdated }) {
     setSaving(true); setSaveMsg('')
     const { error } = await setStat(editKey, num)
     setSaving(false)
-    if (error) { setSaveMsg('Save failed — check console.'); return }
+    if (error) { setSaveMsg('Save failed check console.'); return }
     setSaveMsg(`✓ ${STAT_OPTIONS.find(o => o.key === editKey)?.label} set to ${num.toLocaleString()}`)
     onCountUpdated(editKey, num)
     setEditValue('')
@@ -590,8 +590,8 @@ function AdminPanel({ currentCount, onCountUpdated }) {
               )}
               <div className="glass p-3 rounded-xl border border-white/8 text-xs text-white/30 font-mono">
                 {isConfigured
-                  ? '✓ Connected to Supabase — changes persist to cloud'
-                  : '⚠ Supabase not configured — changes saved to localStorage only'}
+                  ? '✓ Connected to Supabase, changes persist to cloud'
+                  : '⚠ Supabase not configured, changes saved to localStorage only'}
               </div>
             </div>
           )}

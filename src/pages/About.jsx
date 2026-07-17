@@ -74,7 +74,7 @@ export default function About() {
             <h3 className="font-display text-xl font-bold">Mission Statement</h3>
           </div>
           <blockquote className="text-white/80 text-lg leading-relaxed italic border-l-2 border-teal-400 pl-4">
-            "To close the AI literacy gap in K–12 education by bringing hands-on, research-grounded simulations and workshops directly to students across San Diego County — making the future of technology visible, understandable, and achievable for every young person."
+            "To close the AI literacy gap in K–12 education by bringing hands-on, research-grounded simulations and workshops directly to students across San Diego County making the future of technology visible, understandable, and achievable for every young person."
           </blockquote>
         </div>
 

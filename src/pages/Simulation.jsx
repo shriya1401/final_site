@@ -12,7 +12,7 @@ import GlassCard from "../components/ui/GlassCard";
 const MODES = [
   { id:"fixed",  label:"Mode A", name:"Fixed Timer",   tagline:"Traditional 30s/30s NS-EW cycle",              color:"#ef4444", colorClass:"text-red-400",    borderClass:"border-red-400/40",    bgClass:"bg-red-500/10",    description:"Fixed-timer signals switch on a rigid schedule (30s NS, 30s EW) regardless of actual traffic. Based on Stage 1 of the Gold Award Python simulation using Poisson vehicle arrivals and queue-based service.",          notebookRef:"Smart_Signals_Stage1.ipynb" },
   { id:"sensor", label:"Mode B", name:"Sensor-Based",  tagline:"Induction-loop actuated controller",            color:"#f59e0b", colorClass:"text-yellow-400", borderClass:"border-yellow-400/40", bgClass:"bg-yellow-500/10", description:"Induction-loop sensors detect waiting vehicles and extend the green phase (min 10s, max 45s, gap 3s). When no cars are detected for 3s AND cross-traffic is waiting, the signal switches. Based on Stage 2 notebook logic.", notebookRef:"Smart_Signals_Stage2_Induction.ipynb" },
-  { id:"ai",     label:"Mode C", name:"AI Adaptive",   tagline:"Reinforcement Learning Q-Learning controller",  color:"#00d4ff", colorClass:"text-cyan-400",   borderClass:"border-cyan-400/40",   bgClass:"bg-cyan-500/10",   description:"A Reinforcement Learning agent monitors NS and EW queue lengths and dynamically serves the longest queue — maximizing throughput and minimizing wait times. Adapted from the Stage 3 Q-Learning notebook.",               notebookRef:"Smart_Signals_Stage3_AI_RL.ipynb" },
+  { id:"ai",     label:"Mode C", name:"AI Adaptive",   tagline:"Reinforcement Learning Q-Learning controller",  color:"#00d4ff", colorClass:"text-cyan-400",   borderClass:"border-cyan-400/40",   bgClass:"bg-cyan-500/10",   description:"A Reinforcement Learning agent monitors NS and EW queue lengths and dynamically serves the longest queue, maximizing throughput and minimizing wait times. Adapted from the Stage 3 Q-Learning notebook.",               notebookRef:"Smart_Signals_Stage3_AI_RL.ipynb" },
 ];
 
 const FPS           = 60;
@@ -469,7 +469,7 @@ export default function Simulation() {
     <div className="min-h-screen pt-24 pb-20 px-4">
       <div className="max-w-7xl mx-auto">
         <SectionHeader tag="Interactive Simulation" title="Smart Traffic" highlight="Signal Simulator"
-          subtitle="Compare three real traffic control algorithms — from the actual Gold Award Python notebooks — in your browser." />
+          subtitle="Compare three real traffic control algorithms, from the actual Gold Award Python notebooks, in your browser." />
 
         <div className="flex flex-col sm:flex-row gap-3 mb-8 justify-center">
           {MODES.map(m => (
