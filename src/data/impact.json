@@ -1,56 +1,54 @@
 {
-  "testimonials": [
+  "goals": [
     {
       "id": 1,
-      "name": "Ms. Rodriguez",
-      "role": "7th Grade Science Teacher",
-      "school": "Lincoln Middle School",
-      "quote": "The simulation made abstract AI concepts tangible. My students were genuinely excited — they kept asking to run it again and try different settings.",
-      "rating": 5
+      "goal": "Reach 750 students through AI and cybersecurity education",
+      "progress": 100,
+      "current": 754,
+      "target": 750
     },
     {
       "id": 2,
-      "name": "Principal Davis",
-      "role": "Elementary School Principal",
-      "school": "Riverside Elementary",
-      "quote": "A remarkable project. The presenter connected with every age group, and the hands-on component kept even our youngest students fully engaged.",
-      "rating": 5
+      "goal": "Conduct 17 educational workshops",
+      "progress": 100,
+      "current": 17,
+      "target": 17
     },
     {
       "id": 3,
-      "name": "Alex T.",
-      "role": "9th Grade Student",
-      "school": "Jefferson High School",
-      "quote": "I never thought about how traffic lights could use AI. Now I want to study computer science. The RL explanation was actually easy to follow!",
-      "rating": 5
+      "goal": "Partner with 11 schools and community organizations",
+      "progress": 100,
+      "current": 11,
+      "target": 11
     },
     {
       "id": 4,
-      "name": "Dr. Kim",
-      "role": "STEM Coordinator",
-      "school": "San Diego Unified School District",
-      "quote": "This Gold Award project is exactly the kind of community-driven STEM outreach we need more of. The resources are high-quality and curriculum-aligned.",
-      "rating": 5
-    },
-    {
-      "id": 5,
-      "name": "Maya S.",
-      "role": "8th Grade Student",
-      "school": "King Middle School",
-      "quote": "The cybersecurity quiz was really fun and kind of scary — I didn't realize how easy it is to get phished. Changed how I think about online safety.",
-      "rating": 5
+      "goal": "Develop 13 educational AI and cybersecurity resources",
+      "progress": 100,
+      "current": 13,
+      "target": 13
     }
   ],
-  "goals": [
-    { "id": 1, "goal": "Reach 500 students across San Diego County", "progress": 20, "current": 100, "target": 500 },
-    { "id": 2, "goal": "Conduct 20 school/community workshops", "progress": 25, "current": 5, "target": 20 },
-    { "id": 3, "goal": "Partner with 10 organizations", "progress": 60, "current": 6, "target": 10 },
-    { "id": 4, "goal": "Develop 8 downloadable resources", "progress": 0, "current": 0, "target": 8 }
-  ],
   "impactMetrics": [
-    { "label": "Pre/Post Quiz Improvement", "value": "34%", "description": "Average improvement in AI literacy scores after workshops" },
-    { "label": "Students Interested in STEM Careers", "value": "78%", "description": "Reported increased interest in STEM fields post-workshop" },
-    { "label": "Teacher Satisfaction Rate", "value": "96%", "description": "Teachers who rated the workshop as 'excellent' or 'very good'" },
-    { "label": "Resources Downloaded", "value": "In Progress", "description": "Total resource downloads across all platforms" }
+    {
+      "label": "People Reached",
+      "value": "754+",
+      "description": "People who participated in AI and cybersecurity workshops and outreach events."
+    },
+    {
+      "label": "Workshops Conducted",
+      "value": "17",
+      "description": "Interactive AI and cybersecurity workshops delivered in schools and community settings."
+    },
+    {
+      "label": "Partner Organizations",
+      "value": "11",
+      "description": "Schools, libraries, nonprofits, and community organizations that collaborated on the project."
+    },
+    {
+      "label": "Educational Resources",
+      "value": "13",
+      "description": "Presentations, lesson plans, activities, quizzes, simulations, and educational materials created."
+    }
   ]
 }

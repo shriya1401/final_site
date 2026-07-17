@@ -124,8 +124,8 @@ export default function Home() {
               PROJECT IMPACT
             </span>
           </div>
-          <div className="grid grid-cols-3 gap-4">
-            {siteData.stats.map(stat => (
+<div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {siteData.stats.map(stat => (
               <div key={stat.id} className="metric-card">
                 <div className="font-display text-4xl md:text-5xl font-black cyber-text mb-1">
                   <AnimatedCounter target={stat.value} suffix={stat.suffix} />
@@ -190,7 +190,7 @@ export default function Home() {
                 {[
                   { label: "Community Benefit", value: "AI education for underserved schools" },
                   { label: "Sustainability", value: "Open-source resources + teacher training" },
-                  { label: "Impact", value: "450+ students reached across 12 schools" },
+                  { label: "Impact", value: "754+ people reached across 12 schools" },
                   { label: "Original Research", value: "Python simulation notebooks for 3 signal modes" },
                 ].map(item => (
                   <div key={item.label} className="glass p-4 rounded-xl border border-white/10">

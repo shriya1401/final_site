@@ -7,31 +7,38 @@
   "stats": [
     {
       "id": 1,
-      "label": "Students Reached",
-      "value": 100,
+      "label": "People Reached",
+      "value": 754,
       "suffix": "+",
       "icon": "Users"
     },
     {
       "id": 2,
       "label": "Workshops Conducted",
-      "value": 5,
+      "value": 17,
       "suffix": "",
       "icon": "BookOpen"
     },
     {
       "id": 3,
-      "label": "Community Partners",
-      "value": 6,
+      "label": "Partner Organizations",
+      "value": 11,
       "suffix": "",
-      "icon": "Handshake"
+      "icon": "Building"
+    },
+    {
+      "id": 4,
+      "label": "Educational Resources",
+      "value": 13,
+      "suffix": "",
+      "icon": "GraduationCap"
     }
   ],
   "highlights": [
     {
       "id": 1,
       "title": "Interactive AI Simulation",
-      "description": "Students control a live 4-way intersection comparing fixed timers vs. sensor-based vs. AI-adaptive signals \u2014 based on real Python simulations.",
+      "description": "Students control a live 4-way intersection comparing fixed-timer, sensor-based, and AI-adaptive signals using real Python simulations.",
       "icon": "TrafficCone",
       "color": "cyber"
     },
@@ -45,7 +52,7 @@
     {
       "id": 3,
       "title": "STEM Career Pathways",
-      "description": "Resources connecting students to AI, transportation engineering, and cybersecurity career opportunities.",
+      "description": "Resources connect students to careers in artificial intelligence, transportation engineering, data science, and cybersecurity.",
       "icon": "Rocket",
       "color": "teal"
     }

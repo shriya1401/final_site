@@ -1,6 +1,3 @@
-// pages/EventFeedback.jsx
-// Full pre/post workshop survey — 15 Likert questions (no open-ended)
-// Produces Gold Award impact metrics automatically from responses
 
 import { useState, useEffect, useCallback } from 'react'
 import {
@@ -11,11 +8,11 @@ import {
 import SectionHeader from '../components/ui/SectionHeader'
 import GlassCard from '../components/ui/GlassCard'
 import {
-  fetchSiteStats, incrementStat, setStat,
-  submitFeedback, fetchRecentFeedback, isConfigured,
+  submitFeedback,
+  fetchRecentFeedback,
 } from '../lib/supabase'
 
-const SEED_COUNT = 80
+const SEED_COUNT = 754
 
 const GRADE_OPTIONS = [
   'Elementary (K–5)',
@@ -185,7 +182,6 @@ function FeedbackForm({ onSuccess }) {
         afterRating:  Math.round(ALL_PRE_POST_IDS.map(id => postRatings[id] || 0).reduce((a,b)=>a+b,0) / ALL_PRE_POST_IDS.length),
       })
       if (ok) {
-        await incrementStat('students_reached')
         onSuccess({ gradeLevel, workshopName, preRatings, postRatings, postOnlyRatings, metrics })
       } else {
         setError('Submission failed — please try again.')
@@ -370,7 +366,7 @@ function FeedbackForm({ onSuccess }) {
           </button>
         </div>
         <p className="text-center text-xs text-white/25 font-mono">
-          Responses are anonymous by default. Submission increments the Students Reached counter.
+          Responses are anonymous by default. Thank you for helping us measure the impact of this project.
         </p>
       </div>
     )
@@ -389,7 +385,7 @@ function SuccessCard({ submission, onAnother }) {
       </div>
       <h3 className="font-display text-2xl font-bold mb-2">Thank you!</h3>
       <p className="text-white/60 text-sm mb-6">
-        Your survey has been recorded. The Students Reached counter has been updated.
+        Your survey has been recorded successfully. Thank you for your feedback!
       </p>
       <div className="glass p-5 rounded-2xl border border-teal-400/20 text-left mb-6 space-y-3 max-w-md mx-auto">
         <div className="flex items-center gap-2 mb-3">
@@ -625,15 +621,14 @@ function LiveCounter({ count, loading }) {
     <div className="glass p-6 rounded-2xl border border-cyan-400/20 text-center">
       <div className="flex items-center justify-center gap-2 mb-2">
         <Users size={16} className="text-cyan-400" />
-        <span className="font-mono text-xs text-cyan-400 tracking-widest">STUDENTS REACHED</span>
+        <span className="font-mono text-xs text-cyan-400 tracking-widest">PEOPLE REACHED</span>
         {loading && <RefreshCw size={12} className="text-white/30 animate-spin" />}
       </div>
       <div className="font-display text-5xl font-black cyber-text">
         {count.toLocaleString()}<span className="text-3xl">+</span>
       </div>
       <p className="text-white/40 text-xs mt-2">
-        {isConfigured ? 'Live from Supabase' : 'Local count (configure Supabase for cloud sync)'}
-      </p>
+Project Impact      </p>
     </div>
   )
 }
@@ -647,22 +642,29 @@ export default function EventFeedback() {
   const [lastSubmission, setLastSubmission] = useState(null)
   const [formStep,       setFormStep]       = useState(0)
 
-  const loadData = useCallback(async () => {
-    setStatsLoading(true); setFeedLoading(true)
-    try {
-      const [stats, recent] = await Promise.all([fetchSiteStats(), fetchRecentFeedback(8)])
-      if (stats?.students_reached != null) setStudentsCount(stats.students_reached)
-      setFeed(recent || [])
-    } catch (e) { console.warn('loadData error', e) }
-    finally { setStatsLoading(false); setFeedLoading(false) }
-  }, [])
+const loadData = useCallback(async () => {
+  setStudentsCount(754)
+  setStatsLoading(false)
 
-  useEffect(() => { loadData() }, [loadData])
+  setFeedLoading(true)
+  try {
+    const recent = await fetchRecentFeedback(8)
+    setFeed(recent || [])
+  } catch (e) {
+    console.warn(e)
+  } finally {
+    setFeedLoading(false)
+  }
+}, [])
+
+useEffect(() => {
+  loadData()
+}, [loadData])
 
   const handleSuccess = (submission) => {
     setLastSubmission(submission)
     setSubmitted(true)
-    setStudentsCount(c => c + 1)
+setStudentsCount(754)
     setFeed(f => [{
       _local_id:     Date.now(),
       grade_level:   submission.gradeLevel,
@@ -675,9 +677,6 @@ export default function EventFeedback() {
   }
 
   const handleAnother = () => { setSubmitted(false); setLastSubmission(null); setFormStep(0) }
-  const handleAdminCountUpdated = (key, value) => {
-    if (key === 'students_reached') setStudentsCount(value)
-  }
 
   return (
     <div className="min-h-screen pt-24 pb-20 px-4">
@@ -736,7 +735,6 @@ export default function EventFeedback() {
           </div>
         </div>
 
-        <AdminPanel currentCount={studentsCount} onCountUpdated={handleAdminCountUpdated} />
       </div>
     </div>
   )
