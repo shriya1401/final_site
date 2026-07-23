@@ -35,7 +35,7 @@ function buildCertSvg(name, trackKey) {
       <circle cx="300" cy="78" r="26" fill="${track.light}" stroke="${track.color}" stroke-width="1.5"/>
       <path d="M 300 64 L 308 76 L 300 88 L 292 76 Z" fill="${track.color}"/>
       <text x="300" y="130" text-anchor="middle" font-size="13" letter-spacing="3" fill="${track.color}" font-weight="600" font-family="Arial">CERTIFICATE OF ACHIEVEMENT</text>
-      <text x="300" y="160" text-anchor="middle" font-size="11" fill="#5F5E5A" font-family="Arial">AI on the Streets — Girl Scout Gold Award Project</text>
+      <text x="300" y="160" text-anchor="middle" font-size="11" fill="#5F5E5A" font-family="Arial">AI on the Streets: Girl Scout Gold Award Project</text>
       <line x1="220" y1="180" x2="380" y2="180" stroke="${track.color}" stroke-width="0.75"/>
       <text x="300" y="225" text-anchor="middle" font-size="26" font-weight="600" fill="#2C2C2A" font-family="Arial">${esc(displayName)}</text>
       <text x="300" y="255" text-anchor="middle" font-size="13" fill="#444441" font-family="Arial">${esc(track.sub)}</text>
@@ -119,12 +119,17 @@ export default function Certificate() {
                 type="text" value={name} onChange={(e) => setName(e.target.value)}
                 placeholder="Student's full name" className="input-field" style={{ flex: 1, minWidth: "180px" }}
               />
-              <select value={trackKey} onChange={(e) => setTrackKey(e.target.value)} className="input-field" style={{ minWidth: "220px" }}>
-                <option value="ai">AI Explorer — Learn AI quiz</option>
-                <option value="cyber">Cyber Defender — Cybersecurity quiz</option>
-                <option value="sim">Traffic Engineer — Simulation challenge</option>
-                <option value="all">Gold Award Graduate — All three</option>
-              </select>
+<select
+  value={trackKey}
+  onChange={(e) => setTrackKey(e.target.value)}
+  className="input-field"
+  style={{ minWidth: "220px" }}
+>
+  <option value="ai">AI Explorer: Learn AI quiz</option>
+  <option value="cyber">Cyber Defender: Cybersecurity quiz</option>
+  <option value="sim">Traffic Engineer: Simulation challenge</option>
+  <option value="all">Gold Award Graduate: All three learning tracks</option>
+</select>
             </div>
 
             <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: "16px", padding: "24px", display: "flex", justifyContent: "center" }}>

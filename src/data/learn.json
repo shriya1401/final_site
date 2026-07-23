@@ -5,7 +5,7 @@
       "title": "What is Artificial Intelligence?",
       "icon": "Brain",
       "color": "cyber",
-      "summary": "AI is software that learns from data and makes decisions — like a traffic light that gets smarter over time.",
+      "summary": "AI is software that learns from data and makes decisions, like a traffic light that gets smarter over time.",
       "content": "Artificial Intelligence (AI) refers to computer systems that can perform tasks that normally require human intelligence: recognizing patterns, making decisions, and improving from experience. Unlike traditional programs that follow fixed rules, AI can adapt based on new data.",
       "keyPoints": ["Pattern recognition", "Decision-making from data", "Learning and adaptation", "Automation of complex tasks"]
     },
@@ -14,7 +14,7 @@
       "title": "Machine Learning Basics",
       "icon": "Cpu",
       "color": "violet",
-      "summary": "Machine Learning is how AI learns — by feeding it examples until it recognizes patterns on its own.",
+      "summary": "Machine Learning is how AI learns, by feeding it examples until it recognizes patterns on its own.",
       "content": "Machine Learning (ML) is a subset of AI where systems learn from data without being explicitly programmed for each situation. There are three main types: Supervised Learning (learns from labeled examples), Unsupervised Learning (finds patterns without labels), and Reinforcement Learning (learns by trial and reward).",
       "keyPoints": ["Supervised Learning", "Unsupervised Learning", "Reinforcement Learning", "Neural Networks"]
     },
@@ -41,7 +41,7 @@
       "title": "AI in Cybersecurity",
       "icon": "Shield",
       "color": "violet",
-      "summary": "AI defends networks by detecting threats in real-time — and attackers use it too, making the battle ongoing.",
+      "summary": "AI defends networks by detecting threats in real time, and attackers use it too, making the battle ongoing.",
       "content": "AI powers both sides of cybersecurity. Defensive AI can detect unusual network behavior (anomaly detection), identify malware, and respond to threats faster than any human. But attackers use AI to craft more convincing phishing emails and find vulnerabilities. This is why AI ethics and security are inseparable.",
       "keyPoints": ["Anomaly detection", "Malware identification", "Threat response automation", "Adversarial AI"]
     },
@@ -50,7 +50,7 @@
       "title": "AI Ethics",
       "icon": "Scale",
       "color": "teal",
-      "summary": "AI must be fair, transparent, and accountable — because biased AI can cause real harm to real people.",
+      "summary": "AI must be fair, transparent, and accountable because biased AI can cause real harm to real people.",
       "content": "AI ethics addresses the moral questions around building and deploying AI systems. Key concerns include algorithmic bias (AI that treats certain groups unfairly due to biased training data), transparency (can we explain why an AI made a decision?), privacy (what data does AI collect?), and accountability (who is responsible when AI goes wrong?).",
       "keyPoints": ["Algorithmic fairness", "Transparency & explainability", "Data privacy", "Human oversight"]
     }
@@ -60,13 +60,13 @@
       "id": 1,
       "question": "What type of machine learning does the traffic simulation's Mode C (AI Adaptive) use, and what makes it different from supervised learning?",
       "options": [
-        "Supervised Learning — it learns from a labeled dataset of correct signal timings",
-        "Reinforcement Learning — an agent learns by receiving rewards for reducing queue lengths through trial and error",
-        "Unsupervised Learning — it clusters traffic patterns without any feedback",
-        "Rule-based AI — it follows a fixed set of if-then conditions programmed by engineers"
+        "Supervised Learning, it learns from a labeled dataset of correct signal timings",
+        "Reinforcement Learning, an agent learns by receiving rewards for reducing queue lengths through trial and error",
+        "Unsupervised Learning, it clusters traffic patterns without any feedback",
+        "Rule-based AI, it follows a fixed set of if-then conditions programmed by engineers"
       ],
       "correct": 1,
-      "explanation": "Reinforcement Learning (RL) is unique because there's no labeled dataset. The agent (signal controller) tries different actions, observes outcomes (queue length, wait times), and receives a reward signal. Over many iterations it learns a policy that maximizes throughput — exactly how Pittsburgh's SURTRAC system works."
+      "explanation": "Reinforcement Learning (RL) is unique because there's no labeled dataset. The agent (signal controller) tries different actions, observes outcomes (queue length, wait times), and receives a reward signal. Over many iterations it learns a policy that maximizes throughput, exactly how Pittsburgh's SURTRAC system works."
     },
     {
       "id": 2,
@@ -84,13 +84,13 @@
       "id": 3,
       "question": "Which of the following best describes the difference between Artificial Intelligence and Machine Learning?",
       "options": [
-        "They are the same thing — AI and ML are interchangeable terms",
+        "They are the same thing; AI and ML are interchangeable terms",
         "Machine Learning is a broader field that includes AI as a subset",
         "AI is the broader field of creating intelligent systems; Machine Learning is one technique within AI that learns from data",
         "AI only refers to robots, while Machine Learning refers to software"
       ],
       "correct": 2,
-      "explanation": "AI is the overarching field — any technique that makes machines behave intelligently. ML is one powerful approach within AI where systems learn patterns from data rather than being explicitly programmed. Other AI approaches include rule-based expert systems and evolutionary algorithms."
+      "explanation": "AI is the overarching field, any technique that makes machines behave intelligently. ML is one powerful approach within AI where systems learn patterns from data rather than being explicitly programmed. Other AI approaches include rule-based expert systems and evolutionary algorithms."
     },
     {
       "id": 4,
@@ -102,7 +102,7 @@
         "The model has too many parameters and needs to be simplified"
       ],
       "correct": 1,
-      "explanation": "This is the 'accuracy paradox.' With a 1% disease prevalence, a model that always predicts 'healthy' is 99% accurate — but completely useless clinically. Better metrics for imbalanced datasets are precision, recall, and F1-score, which measure how well the model actually identifies positive cases."
+      "explanation": "This is the 'accuracy paradox.' With a 1% disease prevalence, a model that always predicts 'healthy' is 99% accurate, but completely useless clinically. Better metrics for imbalanced datasets are precision, recall, and F1-score, which measure how well the model actually identifies positive cases."
     },
     {
       "id": 5,
@@ -114,7 +114,7 @@
         "An AI with a simpler design that runs faster and uses less memory"
       ],
       "correct": 1,
-      "explanation": "Explainable AI (XAI) produces models whose reasoning can be understood by humans — not just 'the model said so.' In high-stakes domains like criminal sentencing, medical diagnosis, or loan approvals, people have a right to know why a decision was made and to contest it if it's wrong."
+      "explanation": "Explainable AI (XAI) produces models whose reasoning can be understood by humans, not just 'the model said so.' In high-stakes domains like criminal sentencing, medical diagnosis, or loan approvals, people have a right to know why a decision was made and to contest it if it's wrong."
     }
   ]
 }

@@ -39,9 +39,9 @@ function CyberQuiz() {
       <div className="glass p-8 rounded-2xl border border-cyan-400/20 text-center">
         <Shield size={48} className={`mx-auto mb-4 ${pct >= 75 ? "text-teal-400" : pct >= 50 ? "text-yellow-400" : "text-red-400"}`} />
         <div className="font-display text-5xl font-black cyber-text mb-2">{pct}%</div>
-        <div className="text-white/60 mb-4">Cybersecurity Score — {score}/{cyberData.quiz.length} correct</div>
+        <div className="text-white/60 mb-4">Cybersecurity Score: {score}/{cyberData.quiz.length} correct</div>
         <p className="text-white/70 mb-6">
-          {pct >= 75 ? "🔒 Excellent! You're cyber-aware and ready to help protect your community." : pct >= 50 ? "Good effort! Review the topics above to strengthen your defenses." : "Keep learning — cybersecurity knowledge protects you and your community!"}
+          {pct >= 75 ? "🔒 Excellent! You're cyber-aware and ready to help protect your community." : pct >= 50 ? "Good effort! Review the topics above to strengthen your defenses." : "Keep learning. cybersecurity knowledge protects you and your community!"}
         </p>
         <button onClick={restart} className="btn-cyber">Try Again</button>
       </div>
@@ -105,8 +105,7 @@ export default function Cybersecurity() {
           tag="Digital Safety"
           title="Cybersecurity &"
           highlight="Smart Cities"
-          subtitle="Why protecting AI-powered infrastructure matters — and how you can stay safe online."
-        />
+subtitle="Why protecting AI-powered infrastructure matters, and how you can stay safe online."        />
 
         {/* Topics */}
         <div className="space-y-6 mb-16">

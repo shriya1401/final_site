@@ -89,10 +89,15 @@ export default function Home() {
             Smarter Signals, Smarter People
           </p>
 
-          {/* Tagline */}
-          <p className="text-white/60 text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
-            {siteData.hero.tagline}
-          </p>
+{/* Tagline */}
+<p className="text-white/60 text-lg md:text-xl max-w-2xl mx-auto mb-5 leading-relaxed">
+  {siteData.hero.tagline}
+</p>
+
+<h2 className="font-display text-2xl md:text-4xl font-bold mb-10">
+  <span className="text-white">By</span>{" "}
+  <span className="cyber-text">Shriya Paladugu</span>
+</h2>
 
           {/* CTA buttons */}
           <div className="flex flex-wrap gap-4 justify-center">
@@ -177,7 +182,7 @@ export default function Home() {
                 </span>
                 <h2 className="section-title mb-4">Girl Scout <span className="text-violet-400">Gold Award</span></h2>
                 <p className="text-white/60 leading-relaxed mb-4">
-                  The Gold Award is the highest achievement in Girl Scouting — awarded to girls who identify a problem in their community, develop a sustainable solution, and create lasting change.
+                  The Gold Award is the highest achievement in Girl Scouting awarded to girls who identify a problem in their community, develop a sustainable solution, and create lasting change.
                 </p>
                 <p className="text-white/60 leading-relaxed">
                   This project addresses AI literacy gaps in K–12 education by bringing hands-on simulations and workshops directly to schools across San Diego County.
@@ -190,7 +195,7 @@ export default function Home() {
                 {[
                   { label: "Community Benefit", value: "AI education for underserved schools" },
                   { label: "Sustainability", value: "Open-source resources + teacher training" },
-                  { label: "Impact", value: "754+ people reached across 12 schools" },
+                  { label: "Impact", value: "896+ people reached across 12 schools" },
                   { label: "Original Research", value: "Python simulation notebooks for 3 signal modes" },
                 ].map(item => (
                   <div key={item.label} className="glass p-4 rounded-xl border border-white/10">
